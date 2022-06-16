@@ -10,8 +10,8 @@
         // -----
 
         public static TAccumulate Aggregate<TRoot, TCurrent, TNode, TAccumulate>(this in SpanHost<TRoot, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TCurrent, TAccumulate> func)
-            where TNode : struct, INode<TCurrent> =>
-            source.CreateViaPush<TAccumulate, FoldForward<TCurrent, TAccumulate>>(new(func, seed));
+            where TNode : struct, IStreamNode<TCurrent> =>
+            source.Execute<TAccumulate, Aggregate<TCurrent, TAccumulate>>(new(func, seed));
 
         //- [ ] `TResult Aggregate<TSource, TAccumulate, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector);`
         //- [ ] `bool All<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
@@ -216,8 +216,8 @@
         //- [ ] `IEnumerable<TSource> UnionBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
 
         public static SpanHost<TRoot, TCurrent, WhereNode<TCurrent, TNode>> Where<TRoot, TCurrent, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
-            where TNode : struct, INode<TCurrent> =>
-            new(source.Span, new (source.Node, predicate));
+            where TNode : struct, IStreamNode<TCurrent> =>
+            new(source.Span, new (in source.Node, predicate));
 
         //- [ ] `IEnumerable<TSource> Where<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, bool> predicate);`
         //- [ ] `IEnumerable<(TFirst First, TSecond Second, TThird Third)> Zip<TFirst, TSecond, TThird>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third);`

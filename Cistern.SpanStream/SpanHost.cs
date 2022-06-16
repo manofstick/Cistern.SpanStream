@@ -1,18 +1,18 @@
 ﻿namespace Cistern.SpanStream;
 
-public readonly ref struct SpanHost<TRoot, TCurrent, TNode>
-    where TNode : struct, INode<TCurrent>
+public readonly ref struct SpanHost<TSource, TCurrent, TStreamNode>
+    where TStreamNode : struct, IStreamNode<TCurrent>
 {
-    public ReadOnlySpan<TRoot> Span { get; }
-    public TNode Node { get; }
+    public readonly ReadOnlySpan<TSource> Span;
+    public readonly TStreamNode Node;
 
-    public SpanHost(in ReadOnlySpan<TRoot> span, in TNode node)
+    public SpanHost(in ReadOnlySpan<TSource> span, in TStreamNode node)
     {
         Span = span;
         Node = node;
     }
 
-    public TResult CreateViaPush<TResult, TPushEnumerator>(in TPushEnumerator fenum)
-        where TPushEnumerator : struct, IPushEnumerator<TCurrent> =>
-        Node.CreateViaPush<TRoot, TResult, TPushEnumerator>(Span, fenum);
+    public TResult Execute<TResult, TProcessStream>(in TProcessStream processStream)
+        where TProcessStream : struct, IProcessStream<TCurrent, TResult> =>
+        Node.Execute<TSource, TResult, TProcessStream>(Span, processStream);
 }

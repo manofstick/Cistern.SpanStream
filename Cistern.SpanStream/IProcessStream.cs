@@ -1,7 +1,7 @@
 ﻿namespace Cistern.SpanStream;
 
-public interface IPushEnumerator<TElement>
+public interface IProcessStream<TElement, TResult>
 {
     public bool ProcessNext(TElement input);
-    TResult GetResult<TResult>();
+    TResult GetResult();
 }

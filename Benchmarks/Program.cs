@@ -7,51 +7,24 @@ using Cistern.SpanStream;
 namespace Benchmarks;
 
 /*
-|     Method |     N |          Mean |       Error |      StdDev | Allocated |
-|----------- |------ |--------------:|------------:|------------:|----------:|
-|     Manual |     0 |      3.879 ns |   0.0332 ns |   0.0311 ns |         - |
-| SpanStream |     0 |     44.955 ns |   0.2046 ns |   0.1709 ns |         - |
-|     Manual |     1 |      4.964 ns |   0.0176 ns |   0.0165 ns |         - |
-| SpanStream |     1 |     50.027 ns |   0.3521 ns |   0.3122 ns |         - |
-|     Manual |    10 |     12.323 ns |   0.0791 ns |   0.0618 ns |         - |
-| SpanStream |    10 |    103.127 ns |   0.5724 ns |   0.5354 ns |         - |
-|     Manual |   100 |    329.219 ns |   0.9725 ns |   0.9097 ns |         - |
-| SpanStream |   100 |    867.106 ns |   2.3711 ns |   2.2180 ns |         - |
-|     Manual | 10000 | 49,405.724 ns | 252.8588 ns | 236.5243 ns |         - |
-| SpanStream | 10000 | 81,648.793 ns | 414.4425 ns | 387.6698 ns |         - |
+|     Method |     N |          Mean |       Error |      StdDev |  Gen 0 | Allocated |
+|----------- |------ |--------------:|------------:|------------:|-------:|----------:|
+|     Manual |     0 |      4.807 ns |   0.0458 ns |   0.0428 ns |      - |         - |
+| SpanStream |     0 |     33.376 ns |   0.1291 ns |   0.1208 ns |      - |         - |
+|       Linq |     0 |     11.163 ns |   0.0801 ns |   0.0750 ns |      - |         - |
+|     Manual |     1 |      4.578 ns |   0.0388 ns |   0.0363 ns |      - |         - |
+| SpanStream |     1 |     38.149 ns |   0.0162 ns |   0.0126 ns |      - |         - |
+|       Linq |     1 |     30.418 ns |   0.3115 ns |   0.2913 ns | 0.0114 |      48 B |
+|     Manual |    10 |     10.324 ns |   0.0133 ns |   0.0104 ns |      - |         - |
+| SpanStream |    10 |     90.378 ns |   0.4418 ns |   0.4132 ns |      - |         - |
+|       Linq |    10 |    114.849 ns |   0.6244 ns |   0.5535 ns | 0.0114 |      48 B |
+|     Manual |   100 |    341.800 ns |   1.8958 ns |   1.7734 ns |      - |         - |
+| SpanStream |   100 |    848.996 ns |   3.2423 ns |   2.8742 ns |      - |         - |
+|       Linq |   100 |    994.690 ns |   4.4373 ns |   4.1507 ns | 0.0114 |      48 B |
+|     Manual | 10000 | 48,754.260 ns | 258.7518 ns | 242.0366 ns |      - |         - |
+| SpanStream | 10000 | 81,215.123 ns | 319.0773 ns | 298.4651 ns |      - |         - |
+|       Linq | 10000 | 93,293.412 ns | 484.0201 ns | 452.7527 ns |      - |      48 B |
 
- 
-|     Method |     N |          Mean |       Error |      StdDev | Allocated |
-|----------- |------ |--------------:|------------:|------------:|----------:|
-|     Manual |     0 |      3.879 ns |   0.0210 ns |   0.0196 ns |         - |
-| SpanStream |     0 |     44.440 ns |   0.0224 ns |   0.0175 ns |         - |
-|     Manual |     1 |      4.961 ns |   0.0096 ns |   0.0085 ns |         - |
-| SpanStream |     1 |     48.156 ns |   0.0209 ns |   0.0175 ns |         - |
-|     Manual |    10 |     12.566 ns |   0.2769 ns |   0.2590 ns |         - |
-| SpanStream |    10 |    100.570 ns |   0.5382 ns |   0.4771 ns |         - |
-|     Manual |   100 |    333.951 ns |   0.5321 ns |   0.4717 ns |         - |
-| SpanStream |   100 |    866.962 ns |   3.0384 ns |   2.8421 ns |         - |
-|     Manual | 10000 | 49,216.669 ns |  15.5481 ns |  13.7830 ns |         - |
-| SpanStream | 10000 | 81,625.052 ns | 399.7972 ns | 373.9706 ns |         - |
-
-|     Method |     N |          Mean |         Error |        StdDev | Allocated |
-|----------- |------ |--------------:|--------------:|--------------:|----------:|
-|     Manual |     0 |      3.864 ns |     0.0191 ns |     0.0179 ns |         - |
-| SpanStream |     0 |     43.129 ns |     0.1060 ns |     0.0939 ns |         - |
-|     Manual |     1 |      4.957 ns |     0.0269 ns |     0.0239 ns |         - |
-| SpanStream |     1 |     44.849 ns |     0.1486 ns |     0.1318 ns |         - |
-|     Manual |    10 |     12.394 ns |     0.0636 ns |     0.0497 ns |         - |
-| SpanStream |    10 |     98.277 ns |     0.6204 ns |     0.5500 ns |         - |
-|     Manual |   100 |    333.667 ns |     0.7346 ns |     0.6872 ns |         - |
-| SpanStream |   100 |    855.464 ns |     2.2747 ns |     2.1277 ns |         - |
-|     Manual | 10000 | 49,199.876 ns |    12.3642 ns |    10.3247 ns |         - |
-| SpanStream | 10000 | 83,462.156 ns | 1,491.1330 ns | 1,394.8067 ns |         - |
-
-
-|     Method | N |      Mean |     Error |    StdDev | Allocated |
-|----------- |-- |----------:|----------:|----------:|----------:|
-|     Manual | 0 |  5.041 ns | 0.0373 ns | 0.0349 ns |         - |
-| SpanStream | 0 | 34.859 ns | 0.1655 ns | 0.1548 ns |         - |
 */
 [Config(typeof(MyEnvVars))]
 [MemoryDiagnoser]
@@ -73,23 +46,25 @@ public class FirstTest
         }
     }
 
-    [Params(0)]//, 1, 10, 100, 10000)]
+    //[Params(0)]
+    [Params(0, 1, 10, 100, 10000)]
     public int N { get; set; }
 
     private ReadOnlyMemory<byte> data;
+    private byte[] _asArray = null!;
 
     [GlobalSetup]
     public void GlobalSetup()
     {
-        var buffer = new byte[N];
-        new Random(42).NextBytes(buffer);
-        data = buffer;
-
+        _asArray = new byte[N];
+        new Random(42).NextBytes(_asArray);
+        data = _asArray;
          
         var a = Manual();
         var b = SpanStream();
-        if (a != b)
-            throw new Exception();
+        var c = Linq();
+        if (a != b || a != c)
+            throw new Exception("failed validation");
     }
 
     [Benchmark]
@@ -112,6 +87,15 @@ public class FirstTest
             .ToSpanStream()
             .Where(x => x > 128)
             .Aggregate(0, (a,c) => a+c);
+    }
+
+    [Benchmark]
+    public int Linq()
+    {
+        return
+            _asArray
+            .Where(x => x > 128)
+            .Aggregate(0, (a, c) => a + c);
     }
 }
 
@@ -137,6 +121,10 @@ public class Program
         //return;
 
         var zz = new FirstTest();
+        zz.N = 10;
+        zz.GlobalSetup();
+
+        //return;
 
         var summary = BenchmarkRunner.Run<FirstTest>();
     }

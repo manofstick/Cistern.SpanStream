@@ -1,18 +1,17 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Cistern.SpanStream;
+﻿namespace Cistern.SpanStream;
 
 public readonly struct RootNode<TSource>
-    : INode<TSource>
+    : IStreamNode<TSource>
 {
-    public TResult CreateViaPush<TRoot, TResult, TPushEnumerator>(in ReadOnlySpan<TRoot> span, in TPushEnumerator fenum)
-        where TPushEnumerator : struct, IPushEnumerator<TSource>
+    TResult IStreamNode<TSource>.Execute<TDuplicateSource, TResult, TProcessStream>(in ReadOnlySpan<TDuplicateSource> span, in TProcessStream processStream)
     {
-        var x = fenum;
+        System.Diagnostics.Debug.Assert(typeof(TSource) == typeof(TDuplicateSource));
+
+        var localCopy = processStream;
 
         foreach (var item in span)
-            x.ProcessNext((TSource)(object)item!);
+            localCopy.ProcessNext((TSource)(object)item!);
 
-        return x.GetResult<TResult>();
+        return localCopy.GetResult();
     }
 }

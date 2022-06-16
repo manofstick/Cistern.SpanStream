@@ -3,35 +3,31 @@
 namespace Cistern.SpanStream;
 
 public readonly struct WhereNode<T, NodeT>
-    : INode<T>
-    where NodeT : struct, INode<T>
+    : IStreamNode<T>
+    where NodeT : struct, IStreamNode<T>
 {
-    private NodeT Node { get; }
-    private Func<T, bool> Filter { get; }
+    private readonly NodeT Node;
+    private readonly Func<T, bool> Filter;
 
     public WhereNode(in NodeT nodeT, Func<T, bool> predicate) => (Node, Filter) = (nodeT, predicate);
 
-    public TResult CreateViaPush<TRoot, TResult, TPushEnumerator>(in ReadOnlySpan<TRoot> span, in TPushEnumerator fenum)
-        where TPushEnumerator : struct, IPushEnumerator<T> =>
-        Node.CreateViaPush<TRoot, TResult, WhereFoward<T, TPushEnumerator>>(span, new WhereFoward<T, TPushEnumerator>(fenum, Filter));
+    TResult IStreamNode<T>.Execute<TRoot, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
+        Node.Execute<TRoot, TResult, WhereFoward<T, TResult, TProcessStream>>(in span, new (in processStream, Filter));
 }
 
-struct WhereFoward<T, Next>
-    : IPushEnumerator<T>
-    where Next : struct, IPushEnumerator<T>
+struct WhereFoward<T, TResult, TProcessStream>
+    : IProcessStream<T, TResult>
+    where TProcessStream : struct, IProcessStream<T, TResult>
 {
-    Next _next;
+    /* can't be readonly */ TProcessStream _next;
     readonly Func<T, bool> _predicate;
 
-    public WhereFoward(in Next prior, Func<T, bool> predicate) => (_next, _predicate) = (prior, predicate);
+    public WhereFoward(in TProcessStream nextProcessStream, Func<T, bool> predicate) =>
+        (_next, _predicate) = (nextProcessStream, predicate);
 
-    public TResult GetResult<TResult>() => _next.GetResult<TResult>();
+    TResult IProcessStream<T, TResult>.GetResult() => _next.GetResult();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool ProcessNext(T input)
-    {
-        if (_predicate(input))
-            return _next.ProcessNext(input);
-        return true;
-    }
+    bool IProcessStream<T, TResult>.ProcessNext(T input) =>
+        !_predicate(input) || _next.ProcessNext(input);
 }
