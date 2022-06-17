@@ -7,7 +7,7 @@ using Cistern.SpanStream;
 namespace Benchmarks;
 
 /*
-
+where
 |     Method |     N |          Mean |       Error |      StdDev |  Gen 0 | Allocated |
 |----------- |------ |--------------:|------------:|------------:|-------:|----------:|
 |     Manual |     0 |      4.739 ns |   0.0296 ns |   0.0277 ns |      - |         - |
@@ -26,6 +26,24 @@ namespace Benchmarks;
 | SpanStream | 10000 | 76,019.536 ns | 246.5020 ns | 218.5176 ns |      - |         - |
 |       Linq | 10000 | 92,976.025 ns | 393.6327 ns | 368.2043 ns |      - |      48 B |
 
+where-select
+|     Method |     N |           Mean |       Error |      StdDev |  Gen 0 | Allocated |
+|----------- |------ |---------------:|------------:|------------:|-------:|----------:|
+|     Manual |     0 |       4.692 ns |   0.0307 ns |   0.0287 ns |      - |         - |
+| SpanStream |     0 |      37.002 ns |   0.0667 ns |   0.0557 ns |      - |         - |
+|       Linq |     0 |      31.740 ns |   0.0168 ns |   0.0140 ns |      - |         - |
+|     Manual |     1 |       5.561 ns |   0.0037 ns |   0.0033 ns |      - |         - |
+| SpanStream |     1 |      39.205 ns |   0.0175 ns |   0.0146 ns |      - |         - |
+|       Linq |     1 |      64.341 ns |   0.2453 ns |   0.2048 ns | 0.0248 |     104 B |
+|     Manual |    10 |      11.689 ns |   0.1077 ns |   0.0955 ns |      - |         - |
+| SpanStream |    10 |     108.345 ns |   0.3926 ns |   0.3481 ns |      - |         - |
+|       Linq |    10 |     166.512 ns |   1.4231 ns |   1.3312 ns | 0.0248 |     104 B |
+|     Manual |   100 |     335.157 ns |   0.7252 ns |   0.6429 ns |      - |         - |
+| SpanStream |   100 |     961.263 ns |  15.2099 ns |  14.2273 ns |      - |         - |
+|       Linq |   100 |   1,158.043 ns |   6.8088 ns |   5.6856 ns | 0.0248 |     104 B |
+|     Manual | 10000 |  49,726.632 ns | 267.0656 ns | 249.8133 ns |      - |         - |
+| SpanStream | 10000 |  90,667.961 ns | 544.9938 ns | 509.7875 ns |      - |         - |
+|       Linq | 10000 | 102,105.369 ns | 535.7119 ns | 501.1052 ns |      - |     104 B |
 */
 
 [Config(typeof(MyEnvVars))]
@@ -76,7 +94,7 @@ public class FirstTest
         foreach(var item in data.Span)
         {
             if (item > 128)
-                accumulate += item;
+                accumulate += item * 2;
         }
         return accumulate;
     }
@@ -85,10 +103,10 @@ public class FirstTest
     public int SpanStream()
     {
         return
-            data
-            .ToSpanStream()
+            data.Span
             .Where(x => x > 128)
-            .Aggregate(0, (a,c) => a+c);
+            .Select(x => x * 2)
+            .Aggregate(0, (a, c) => a + c);
     }
 
     [Benchmark]
@@ -97,6 +115,7 @@ public class FirstTest
         return
             _asArray
             .Where(x => x > 128)
+            .Select(x => x * 2)
             .Aggregate(0, (a, c) => a + c);
     }
 }
