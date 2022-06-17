@@ -25,6 +25,10 @@ namespace Benchmarks;
 | SpanStream | 10000 | 81,215.123 ns | 319.0773 ns | 298.4651 ns |      - |         - |
 |       Linq | 10000 | 93,293.412 ns | 484.0201 ns | 452.7527 ns |      - |      48 B |
 
+
+
+
+
 */
 [Config(typeof(MyEnvVars))]
 [MemoryDiagnoser]

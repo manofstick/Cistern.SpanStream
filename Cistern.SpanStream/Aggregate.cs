@@ -15,7 +15,7 @@ public struct Aggregate<TSource, TAccumulate>
     TAccumulate IProcessStream<TSource, TAccumulate>.GetResult() => _accumulate;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TSource, TAccumulate>.ProcessNext(TSource input)
+    bool IProcessStream<TSource>.ProcessNext(in TSource input)
     {
         _accumulate = _func(_accumulate, input);
         return true;

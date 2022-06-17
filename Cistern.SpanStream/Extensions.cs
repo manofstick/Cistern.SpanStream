@@ -215,7 +215,7 @@
         //- [ ] `IEnumerable<TSource> UnionBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TSource> second, Func<TSource, TKey> keySelector);`
         //- [ ] `IEnumerable<TSource> UnionBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
 
-        public static SpanHost<TRoot, TCurrent, WhereNode<TCurrent, TNode>> Where<TRoot, TCurrent, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
+        public static SpanHost<TRoot, TCurrent, Where<TCurrent, TNode>> Where<TRoot, TCurrent, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new (in source.Node, predicate));
 

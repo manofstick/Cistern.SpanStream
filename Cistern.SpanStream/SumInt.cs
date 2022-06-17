@@ -12,7 +12,7 @@ public struct SumForward
     int IProcessStream<int, int>.GetResult() => _accumulate;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<int, int>.ProcessNext(int input)
+    bool IProcessStream<int>.ProcessNext(in int input)
     {
         _accumulate += input;
         return true;

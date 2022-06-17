@@ -1,17 +1,17 @@
-﻿namespace Cistern.SpanStream;
+﻿using Cistern.SpanStream.Utils;
+
+namespace Cistern.SpanStream;
 
 public readonly struct RootNode<TSource>
     : IStreamNode<TSource>
 {
-    TResult IStreamNode<TSource>.Execute<TDuplicateSource, TResult, TProcessStream>(in ReadOnlySpan<TDuplicateSource> span, in TProcessStream processStream)
+    TResult IStreamNode<TSource>.Execute<TSourceDuplicate, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
-        System.Diagnostics.Debug.Assert(typeof(TSource) == typeof(TDuplicateSource));
+        var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
 
         var localCopy = processStream;
-
         foreach (var item in span)
-            localCopy.ProcessNext((TSource)(object)item!);
-
+            localCopy.ProcessNext(item);
         return localCopy.GetResult();
     }
 }
