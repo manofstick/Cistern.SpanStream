@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Cistern.SpanStream;
+namespace Cistern.SpanStream.Terminators;
 
 public struct Aggregate<TSource, TAccumulate>
     : IProcessStream<TSource, TAccumulate>

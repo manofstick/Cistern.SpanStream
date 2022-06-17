@@ -1,6 +1,6 @@
 ﻿using Cistern.SpanStream.Utils;
 
-namespace Cistern.SpanStream;
+namespace Cistern.SpanStream.Roots;
 
 public readonly struct RootNode<TSource>
     : IStreamNode<TSource>

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Cistern.SpanStream;
+namespace Cistern.SpanStream.Transforms;
 
 public readonly struct Where<T, NodeT>
     : IStreamNode<T>
@@ -12,14 +12,15 @@ public readonly struct Where<T, NodeT>
     public Where(in NodeT nodeT, Func<T, bool> predicate) => (Node, Filter) = (nodeT, predicate);
 
     TResult IStreamNode<T>.Execute<TRoot, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
-        Node.Execute<TRoot, TResult, WhereStream<T, TResult, TProcessStream>>(in span, new (in processStream, Filter));
+        Node.Execute<TRoot, TResult, WhereStream<T, TResult, TProcessStream>>(in span, new(in processStream, Filter));
 }
 
 struct WhereStream<T, TResult, TProcessStream>
     : IProcessStream<T, TResult>
     where TProcessStream : struct, IProcessStream<T, TResult>
 {
-    /* can't be readonly */ TProcessStream _next;
+    /* can't be readonly */
+    TProcessStream _next;
     readonly Func<T, bool> _predicate;
 
     public WhereStream(in TProcessStream nextProcessStream, Func<T, bool> predicate) =>

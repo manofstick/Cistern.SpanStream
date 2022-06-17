@@ -1,4 +1,8 @@
-﻿namespace Cistern.SpanStream
+﻿using Cistern.SpanStream.Roots;
+using Cistern.SpanStream.Terminators;
+using Cistern.SpanStream.Transforms;
+
+namespace Cistern.SpanStream
 {
     public static class Extensions
     {
