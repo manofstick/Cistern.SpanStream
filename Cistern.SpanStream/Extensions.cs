@@ -6,10 +6,10 @@ namespace Cistern.SpanStream
 {
     public static class Extensions
     {
-        public static SpanHost<T, T, RootNode<T>> ToSpanStream<T>(this in Span<T> span) => new(span, new ());
-        public static SpanHost<T, T, RootNode<T>> ToSpanStream<T>(this in ReadOnlySpan<T> span) => new(span, new());
-        public static SpanHost<T, T, RootNode<T>> ToSpanStream<T>(this in Memory<T> memory) => new(memory.Span, new());
-        public static SpanHost<T, T, RootNode<T>> ToSpanStream<T>(this in ReadOnlyMemory<T> memory) => new(memory.Span, new());
+        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in Span<T> span) => new(span, new ());
+        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in ReadOnlySpan<T> span) => new(span, new());
+        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in Memory<T> memory) => new(memory.Span, new());
+        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in ReadOnlyMemory<T> memory) => new(memory.Span, new());
 
         // -----
 
@@ -222,6 +222,9 @@ namespace Cistern.SpanStream
         public static SpanHost<TRoot, TCurrent, Where<TCurrent, TNode>> Where<TRoot, TCurrent, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new (in source.Node, predicate));
+
+        public static SpanHost<TSource, TSource, WhereRoot<TSource>> Where<TSource>(this in SpanHost<TSource, TSource, Root<TSource>> source, Func<TSource, bool> predicate) =>
+            new(source.Span, new(predicate));
 
         //- [ ] `IEnumerable<TSource> Where<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, bool> predicate);`
         //- [ ] `IEnumerable<(TFirst First, TSecond Second, TThird Third)> Zip<TFirst, TSecond, TThird>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third);`

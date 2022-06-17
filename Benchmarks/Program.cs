@@ -7,29 +7,27 @@ using Cistern.SpanStream;
 namespace Benchmarks;
 
 /*
+
 |     Method |     N |          Mean |       Error |      StdDev |  Gen 0 | Allocated |
 |----------- |------ |--------------:|------------:|------------:|-------:|----------:|
-|     Manual |     0 |      4.807 ns |   0.0458 ns |   0.0428 ns |      - |         - |
-| SpanStream |     0 |     33.376 ns |   0.1291 ns |   0.1208 ns |      - |         - |
-|       Linq |     0 |     11.163 ns |   0.0801 ns |   0.0750 ns |      - |         - |
-|     Manual |     1 |      4.578 ns |   0.0388 ns |   0.0363 ns |      - |         - |
-| SpanStream |     1 |     38.149 ns |   0.0162 ns |   0.0126 ns |      - |         - |
-|       Linq |     1 |     30.418 ns |   0.3115 ns |   0.2913 ns | 0.0114 |      48 B |
-|     Manual |    10 |     10.324 ns |   0.0133 ns |   0.0104 ns |      - |         - |
-| SpanStream |    10 |     90.378 ns |   0.4418 ns |   0.4132 ns |      - |         - |
-|       Linq |    10 |    114.849 ns |   0.6244 ns |   0.5535 ns | 0.0114 |      48 B |
-|     Manual |   100 |    341.800 ns |   1.8958 ns |   1.7734 ns |      - |         - |
-| SpanStream |   100 |    848.996 ns |   3.2423 ns |   2.8742 ns |      - |         - |
-|       Linq |   100 |    994.690 ns |   4.4373 ns |   4.1507 ns | 0.0114 |      48 B |
-|     Manual | 10000 | 48,754.260 ns | 258.7518 ns | 242.0366 ns |      - |         - |
-| SpanStream | 10000 | 81,215.123 ns | 319.0773 ns | 298.4651 ns |      - |         - |
-|       Linq | 10000 | 93,293.412 ns | 484.0201 ns | 452.7527 ns |      - |      48 B |
-
-
-
-
+|     Manual |     0 |      4.739 ns |   0.0296 ns |   0.0277 ns |      - |         - |
+| SpanStream |     0 |     22.213 ns |   0.1215 ns |   0.1137 ns |      - |         - |
+|       Linq |     0 |     11.141 ns |   0.0580 ns |   0.0543 ns |      - |         - |
+|     Manual |     1 |      4.532 ns |   0.0314 ns |   0.0278 ns |      - |         - |
+| SpanStream |     1 |     24.364 ns |   0.1637 ns |   0.1532 ns |      - |         - |
+|       Linq |     1 |     31.334 ns |   0.2093 ns |   0.1748 ns | 0.0114 |      48 B |
+|     Manual |    10 |      7.420 ns |   0.1258 ns |   0.2237 ns |      - |         - |
+| SpanStream |    10 |     82.343 ns |   0.5786 ns |   0.5129 ns |      - |         - |
+|       Linq |    10 |    114.951 ns |   0.6082 ns |   0.5391 ns | 0.0114 |      48 B |
+|     Manual |   100 |    335.089 ns |   1.0011 ns |   0.9364 ns |      - |         - |
+| SpanStream |   100 |    800.837 ns |   2.6049 ns |   2.1752 ns |      - |         - |
+|       Linq |   100 |  1,017.344 ns |  18.9634 ns |  16.8106 ns | 0.0114 |      48 B |
+|     Manual | 10000 | 49,128.252 ns | 128.1920 ns | 119.9108 ns |      - |         - |
+| SpanStream | 10000 | 76,019.536 ns | 246.5020 ns | 218.5176 ns |      - |         - |
+|       Linq | 10000 | 92,976.025 ns | 393.6327 ns | 368.2043 ns |      - |      48 B |
 
 */
+
 [Config(typeof(MyEnvVars))]
 [MemoryDiagnoser]
 public class FirstTest
