@@ -162,6 +162,8 @@ namespace Cistern.SpanStream
         public static SpanHost<TRoot, TNext, Select<TCurrent, TNext, TNode>> Select<TRoot, TCurrent, TNext, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new(in source.Node, selector));
+        public static SpanHost<TCurrent, TNext, WhereSelectRoot<TCurrent, TNext>> Select<TCurrent, TNext>(this in SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>> source, Func<TCurrent, TNext> selector) =>
+            new(source.Span, new(source.Node.Predicate, selector));
 
         //- [ ] `IEnumerable<TResult> Select<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, TResult> selector);`
         //- [ ] `IEnumerable<TResult> Select<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TResult> selector);`

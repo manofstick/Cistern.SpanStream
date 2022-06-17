@@ -24,5 +24,18 @@
                 }
             }
         }
+
+        internal static void Run<TSource, TProcessStream, TNext>(Span<TSource> span, ref TProcessStream stream, Func<TSource, bool> predicate, Func<TSource, TNext> selector)
+            where TProcessStream : struct, IProcessStream<TNext>
+        {
+            for (var i = 0; i < span.Length; ++i)
+            {
+                if (predicate(span[i]))
+                {
+                    if (!stream.ProcessNext(selector(span[i])))
+                        break;
+                }
+            }
+        }
     }
 }
