@@ -8,23 +8,23 @@ namespace Benchmarks;
 
 /*
 where
-|     Method |     N |          Mean |       Error |      StdDev |  Gen 0 | Allocated |
-|----------- |------ |--------------:|------------:|------------:|-------:|----------:|
-|     Manual |     0 |      4.739 ns |   0.0296 ns |   0.0277 ns |      - |         - |
-| SpanStream |     0 |     22.213 ns |   0.1215 ns |   0.1137 ns |      - |         - |
-|       Linq |     0 |     11.141 ns |   0.0580 ns |   0.0543 ns |      - |         - |
-|     Manual |     1 |      4.532 ns |   0.0314 ns |   0.0278 ns |      - |         - |
-| SpanStream |     1 |     24.364 ns |   0.1637 ns |   0.1532 ns |      - |         - |
-|       Linq |     1 |     31.334 ns |   0.2093 ns |   0.1748 ns | 0.0114 |      48 B |
-|     Manual |    10 |      7.420 ns |   0.1258 ns |   0.2237 ns |      - |         - |
-| SpanStream |    10 |     82.343 ns |   0.5786 ns |   0.5129 ns |      - |         - |
-|       Linq |    10 |    114.951 ns |   0.6082 ns |   0.5391 ns | 0.0114 |      48 B |
-|     Manual |   100 |    335.089 ns |   1.0011 ns |   0.9364 ns |      - |         - |
-| SpanStream |   100 |    800.837 ns |   2.6049 ns |   2.1752 ns |      - |         - |
-|       Linq |   100 |  1,017.344 ns |  18.9634 ns |  16.8106 ns | 0.0114 |      48 B |
-|     Manual | 10000 | 49,128.252 ns | 128.1920 ns | 119.9108 ns |      - |         - |
-| SpanStream | 10000 | 76,019.536 ns | 246.5020 ns | 218.5176 ns |      - |         - |
-|       Linq | 10000 | 92,976.025 ns | 393.6327 ns | 368.2043 ns |      - |      48 B |
+|     Method |     N |           Mean |       Error |      StdDev |  Gen 0 | Allocated |
+|----------- |------ |---------------:|------------:|------------:|-------:|----------:|
+|     Manual |     0 |      0.7675 ns |   0.0112 ns |   0.0171 ns |      - |         - |
+| SpanStream |     0 |     19.0559 ns |   0.0115 ns |   0.0090 ns |      - |         - |
+|       Linq |     0 |     11.7656 ns |   0.0057 ns |   0.0047 ns |      - |         - |
+|     Manual |     1 |      5.5511 ns |   0.0030 ns |   0.0025 ns |      - |         - |
+| SpanStream |     1 |     20.0931 ns |   0.2221 ns |   0.1968 ns |      - |         - |
+|       Linq |     1 |     31.2678 ns |   0.7055 ns |   0.6929 ns | 0.0114 |      48 B |
+|     Manual |    10 |     11.2439 ns |   0.2298 ns |   0.1919 ns |      - |         - |
+| SpanStream |    10 |     77.2007 ns |   0.7145 ns |   0.6334 ns |      - |         - |
+|       Linq |    10 |    115.1943 ns |   0.7445 ns |   0.6964 ns | 0.0114 |      48 B |
+|     Manual |   100 |    336.3179 ns |   4.2141 ns |   3.5190 ns |      - |         - |
+| SpanStream |   100 |    798.5584 ns |   2.3239 ns |   2.0601 ns |      - |         - |
+|       Linq |   100 |    992.1810 ns |   4.1095 ns |   3.4316 ns | 0.0114 |      48 B |
+|     Manual | 10000 | 49,176.6397 ns |   9.9341 ns |   8.8063 ns |      - |         - |
+| SpanStream | 10000 | 76,101.9348 ns |  15.0898 ns |  11.7811 ns |      - |         - |
+|       Linq | 10000 | 92,910.5981 ns | 290.1347 ns | 271.3921 ns |      - |      48 B |
 
 where-select
 |     Method |     N |           Mean |       Error |      StdDev |         Median |  Gen 0 | Allocated |
@@ -95,7 +95,8 @@ public class FirstTest
         foreach(var item in data.Span)
         {
             if (item > 128)
-                accumulate += item * 2;
+                accumulate += item;
+//            accumulate += item * 2;
         }
         return accumulate;
     }
@@ -106,7 +107,7 @@ public class FirstTest
         return
             data.Span
             .Where(x => x > 128)
-            .Select(x => x * 2)
+//            .Select(x => x * 2)
             .Aggregate(0, (a, c) => a + c);
     }
 
@@ -116,7 +117,7 @@ public class FirstTest
         return
             _asArray
             .Where(x => x > 128)
-            .Select(x => x * 2)
+//            .Select(x => x * 2)
             .Aggregate(0, (a, c) => a + c);
     }
 }

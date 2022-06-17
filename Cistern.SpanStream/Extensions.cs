@@ -155,10 +155,10 @@ namespace Cistern.SpanStream
         //- [ ] `IEnumerable<TResult> Repeat<TResult>(TResult element, int count);`
         //- [ ] `IEnumerable<TSource> Reverse<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
 
-//        public static SpanHost<TSource, TSource, SelectRoot<TSource>> Select<TSource>(this in ReadOnlySpan<TSource> span, Func<TSource, bool> selector) =>
-//            new(span, new(selector));
-//        public static SpanHost<TSource, TSource, SelectRoot<TSource>> Select<TSource>(this in SpanHost<TSource, TSource, Root<TSource>> source, Func<TSource, bool> selector) =>
-//            new(source.Span, new(selector));
+        public static SpanHost<TSource, TCurrent, SelectRoot<TSource, TCurrent>> Select<TSource, TCurrent>(this in ReadOnlySpan<TSource> span, Func<TSource, TCurrent> selector) =>
+            new(span, new(selector));
+        public static SpanHost<TSource, TCurrent, SelectRoot<TSource, TCurrent>> Select<TSource, TCurrent>(this in SpanHost<TSource, TSource, Root<TSource>> source, Func<TSource, TCurrent> selector) =>
+            new(source.Span, new(selector));
         public static SpanHost<TRoot, TNext, Select<TCurrent, TNext, TNode>> Select<TRoot, TCurrent, TNext, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new(in source.Node, selector));
@@ -166,7 +166,6 @@ namespace Cistern.SpanStream
             new(source.Span, new(source.Node.Predicate, selector));
 
         //- [ ] `IEnumerable<TResult> Select<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, TResult> selector);`
-        //- [ ] `IEnumerable<TResult> Select<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TResult> selector);`
 
         //- [ ] `IEnumerable<TResult> SelectMany<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, IEnumerable<TResult>> selector);`
         //- [ ] `IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector);`

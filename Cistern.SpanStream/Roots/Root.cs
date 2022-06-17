@@ -10,7 +10,7 @@ public readonly struct Root<TSource>
         var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
 
         var localCopy = processStream;
-        Iterator.Run(span, ref localCopy);
+        Iterator.Vanilla(span, ref localCopy);
         return localCopy.GetResult();
     }
 }

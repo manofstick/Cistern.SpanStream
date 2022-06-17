@@ -14,7 +14,7 @@ public readonly struct WhereRoot<TSource>
         var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
 
         var localCopy = processStream;
-        Iterator.Run(span, ref localCopy, Predicate);
+        Iterator.Where(span, ref localCopy, Predicate);
         return localCopy.GetResult();
     }
 }
