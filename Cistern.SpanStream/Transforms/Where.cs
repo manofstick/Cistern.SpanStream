@@ -6,8 +6,8 @@ public readonly struct Where<T, NodeT>
     : IStreamNode<T>
     where NodeT : struct, IStreamNode<T>
 {
-    private readonly NodeT Node;
-    private readonly Func<T, bool> Predicate;
+    public readonly NodeT Node;
+    public Func<T, bool> Predicate { get; }
 
     public Where(in NodeT nodeT, Func<T, bool> predicate) =>
         (Node, Predicate) = (nodeT, predicate);

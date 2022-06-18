@@ -6,8 +6,8 @@ public readonly struct Select<T, U, NodeT>
     : IStreamNode<U>
     where NodeT : struct, IStreamNode<T>
 {
-    private readonly NodeT Node;
-    private readonly Func<T, U> Selector;
+    public readonly NodeT Node;
+    public Func<T, U> Selector { get; }
 
     public Select(in NodeT nodeT, Func<T, U> selector) =>
         (Node, Selector) = (nodeT, selector);

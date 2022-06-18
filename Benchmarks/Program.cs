@@ -94,9 +94,14 @@ public class FirstTest
         var accumulate = 0;
         foreach(var item in data.Span)
         {
-            if (item > 128)
-                accumulate += item;
-//            accumulate += item * 2;
+            int i = item;
+            if (i > 128)
+            {
+                i *= 2;
+                i *= 2;
+                if (i < 500)
+                    accumulate += item;
+            }
         }
         return accumulate;
     }
@@ -107,7 +112,9 @@ public class FirstTest
         return
             data.Span
             .Where(x => x > 128)
-//            .Select(x => x * 2)
+            .Select(x => x * 2)
+            .Select(x => x * 2)
+            .Where(x => x < 500)
             .Aggregate(0, (a, c) => a + c);
     }
 
@@ -117,7 +124,9 @@ public class FirstTest
         return
             _asArray
             .Where(x => x > 128)
-//            .Select(x => x * 2)
+            .Select(x => x * 2)
+            .Select(x => x * 2)
+            .Where(x => x < 500)
             .Aggregate(0, (a, c) => a + c);
     }
 }
