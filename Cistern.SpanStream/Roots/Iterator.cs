@@ -63,5 +63,12 @@ namespace Cistern.SpanStream.Roots
                 }
             }
         }
+        internal static TCurrent[] SelectToArray<TRoot, TCurrent>(ReadOnlySpan<TRoot> span, Func<TRoot, TCurrent> selector)
+        {
+            var result = new TCurrent[span.Length];
+            for (var i = 0; i < span.Length; ++i)
+                result[i] = selector(span[i]);
+            return result;
+        }
     }
 }

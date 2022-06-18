@@ -15,6 +15,7 @@ public interface IProcessStream<TElement, TCurrent, TResult>
 
 public interface IStreamNode<TSource>
 {
+    int? TryGetSize(int sourceSize, out int upperBound);
     TResult Execute<TRoot, TCurrent, TResult, TNextInChain>(in ReadOnlySpan<TRoot> span, in TNextInChain fenum)
         where TNextInChain : struct, IProcessStream<TSource, TCurrent, TResult>;
 }

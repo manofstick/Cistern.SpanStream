@@ -12,6 +12,12 @@ public readonly struct WhereSelectRoot<TSource, TNext>
     public WhereSelectRoot(Func<TSource, bool> predicate, Func<TSource, TNext> selector) =>
         (_predicate, _selector) = (predicate, selector);
 
+    int? IStreamNode<TNext>.TryGetSize(int sourceSize, out int upperBound)
+    {
+        upperBound = sourceSize;
+        return null;
+    }
+
     TResult IStreamNode<TNext>.Execute<TSourceDuplicate, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);

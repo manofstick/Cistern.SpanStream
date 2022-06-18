@@ -13,6 +13,12 @@ public readonly struct Where<T, NodeT>
     public Where(in NodeT nodeT, Func<T, bool> predicate) =>
         (Node, Predicate) = (nodeT, predicate);
 
+    int? IStreamNode<T>.TryGetSize(int sourceSize, out int upperBound)
+    {
+        Node.TryGetSize(sourceSize, out upperBound);
+        return 0;
+    }
+
     TResult IStreamNode<T>.Execute<TRoot, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
         Node.Execute<TRoot, TCurrent, TResult, WhereStream<T, TCurrent, TResult, TProcessStream>>(in span, new(in processStream, Predicate));
 }

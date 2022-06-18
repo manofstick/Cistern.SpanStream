@@ -17,8 +17,15 @@ public readonly struct SelectRoot<TSource, TNext>
 
         Builder<TCurrent>.MemoryChunk memoryChunk = new ();
         var builder = new Builder<TCurrent>(null, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), null);
+
         var localCopy = processStream;
         Iterator.Select(ref builder, span, ref localCopy, Selector);
         return localCopy.GetResult(ref builder);
+    }
+
+    int? IStreamNode<TNext>.TryGetSize(int sourceSize, out int upperBound)
+    {
+        upperBound = sourceSize;
+        return sourceSize;
     }
 }

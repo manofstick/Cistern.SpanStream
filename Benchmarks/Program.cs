@@ -8,6 +8,29 @@ using System.Collections.Immutable;
 namespace Benchmarks;
 
 /*
+
+where-select-toarray
+|     Method |     N |         Mean |      Error |     StdDev |   Gen 0 |  Gen 1 | Allocated |
+|----------- |------ |-------------:|-----------:|-----------:|--------:|-------:|----------:|
+|     Manual |     0 |     26.19 ns |   0.232 ns |   0.217 ns |  0.0210 |      - |      88 B |
+| SpanStream |     0 |     50.99 ns |   0.085 ns |   0.076 ns |       - |      - |         - |
+|       Linq |     0 |     34.05 ns |   0.054 ns |   0.042 ns |       - |      - |         - |
+|     Manual |     1 |     28.36 ns |   0.047 ns |   0.044 ns |  0.0210 |      - |      88 B |
+| SpanStream |     1 |     52.44 ns |   0.057 ns |   0.051 ns |       - |      - |         - |
+|       Linq |     1 |     83.31 ns |   0.260 ns |   0.243 ns |  0.0248 |      - |     104 B |
+|     Manual |    10 |     57.01 ns |   0.103 ns |   0.091 ns |  0.0324 |      - |     136 B |
+| SpanStream |    10 |    126.39 ns |   1.073 ns |   1.004 ns |  0.0114 |      - |      48 B |
+|       Linq |    10 |    208.33 ns |   0.666 ns |   0.623 ns |  0.0591 |      - |     248 B |
+|     Manual |   100 |    484.31 ns |   0.352 ns |   0.294 ns |  0.2041 |      - |     856 B |
+| SpanStream |   100 |    961.66 ns |   4.866 ns |   4.552 ns |  0.1221 |      - |     512 B |
+|       Linq |   100 |  1,178.45 ns |   1.579 ns |   1.233 ns |  0.1907 |      - |     800 B |
+|     Manual | 10000 | 65,837.28 ns | 706.105 ns | 660.491 ns | 15.0146 | 7.4463 |  85,720 B |
+| SpanStream | 10000 | 89,262.44 ns | 636.036 ns | 531.119 ns |  8.9111 | 4.3945 |  50,568 B |
+|       Linq | 10000 | 91,323.56 ns | 505.023 ns | 394.289 ns |  9.0332 | 4.5166 |  53,392 B |
+*/
+
+
+/*
 where
 |     Method |     N |           Mean |       Error |      StdDev |  Gen 0 | Allocated |
 |----------- |------ |---------------:|------------:|------------:|-------:|----------:|
@@ -47,7 +70,6 @@ where-select
 |       Linq | 10000 | 101,768.123 ns | 312.2823 ns | 292.1090 ns | 101,551.819 ns |      - |     104 B |
 
 select-where
-
 |     Method |     N |           Mean |      Error |     StdDev |  Gen 0 | Allocated |
 |----------- |------ |---------------:|-----------:|-----------:|-------:|----------:|
 |     Manual |     0 |       4.960 ns |  0.0272 ns |  0.0254 ns |      - |         - |
@@ -125,22 +147,24 @@ public class FirstTest
     [Benchmark]
     public int[] Manual()
     {
-        var x = ImmutableArray.CreateBuilder<int>();
+        //var x = ImmutableArray.CreateBuilder<int>();
+        var x = new int[data.Length];
+        var idx = 0;
         //var accumulate = 0;
         foreach(var item in data.Span)
         {
             int i = item;
             //if (i < 250)
             {
-                if (i > 128)
+//                if (i > 128)
                 {
                     //accumulate += i * 2;
-                    x.Add(i * 2);
+                    x[idx++] = (i * 2);
                 }
             }
         }
         //return accumulate;
-        return x.ToArray();
+        return x;
     }
 
     [Benchmark]
@@ -149,7 +173,7 @@ public class FirstTest
         return
             data.Span
 //            .Where(x => x < 250)
-            .Where(x => x > 128)
+//            .Where(x => x > 128)
             .Select(x => x * 2)
             .ToArray();
 //            .Aggregate(0, (a, c) => a + c);
@@ -161,7 +185,7 @@ public class FirstTest
         return
             _asArray
             //            .Where(x => x < 250)
-            .Where(x => x > 128)
+//            .Where(x => x > 128)
             .Select(x => x * 2)
             .ToArray();
 //            .Aggregate(0, (a, c) => a + c);

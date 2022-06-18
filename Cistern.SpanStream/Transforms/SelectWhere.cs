@@ -14,6 +14,12 @@ public readonly struct SelectWhere<T, U, NodeT>
     public SelectWhere(in NodeT nodeT, Func<T, U> selector, Func<U, bool> predicate) =>
         (Node, Selector, Predicate) = (nodeT, selector, predicate);
 
+    int? IStreamNode<U>.TryGetSize(int sourceSize, out int upperBound)
+    {
+        Node.TryGetSize(sourceSize, out upperBound);
+        return 0;
+    }
+
     TResult IStreamNode<U>.Execute<TRoot, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
         Node.Execute<TRoot, TCurrent, TResult, SelectWhereStream<T, U, TCurrent, TResult, TProcessStream>>(in span, new(in processStream, Selector, Predicate));
 }

@@ -13,6 +13,8 @@ public readonly struct Select<T, U, NodeT>
     public Select(in NodeT nodeT, Func<T, U> selector) =>
         (Node, Selector) = (nodeT, selector);
 
+    int? IStreamNode<U>.TryGetSize(int sourceSize, out int upperBound) => Node.TryGetSize(sourceSize, out upperBound);
+
     TResult IStreamNode<U>.Execute<TRoot, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
         Node.Execute<TRoot, TCurrent, TResult, SelectStream<T, U, TCurrent, TResult, TProcessStream>>(in span, new(in processStream, Selector));
 }
