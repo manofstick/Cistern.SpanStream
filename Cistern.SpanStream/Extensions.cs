@@ -159,11 +159,14 @@ namespace Cistern.SpanStream
             new(span, new(selector));
         public static SpanHost<TSource, TCurrent, SelectRoot<TSource, TCurrent>> Select<TSource, TCurrent>(this in SpanHost<TSource, TSource, Root<TSource>> source, Func<TSource, TCurrent> selector) =>
             new(source.Span, new(selector));
+        public static SpanHost<TCurrent, TNext, WhereSelectRoot<TCurrent, TNext>> Select<TCurrent, TNext>(this in SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>> source, Func<TCurrent, TNext> selector) =>
+            new(source.Span, new(source.Node.Predicate, selector));
+        public static SpanHost<TRoot, TNext, WhereSelect<TCurrent, TNext, TNode>> Select<TRoot, TCurrent, TNext, TNode>(this in SpanHost<TRoot, TCurrent, Where<TCurrent, TNode>> source, Func<TCurrent, TNext> selector)
+            where TNode : struct, IStreamNode<TCurrent> =>
+            new(source.Span, new(in source.Node.Node, source.Node.Predicate, selector));
         public static SpanHost<TRoot, TNext, Select<TCurrent, TNext, TNode>> Select<TRoot, TCurrent, TNext, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new(in source.Node, selector));
-        public static SpanHost<TCurrent, TNext, WhereSelectRoot<TCurrent, TNext>> Select<TCurrent, TNext>(this in SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>> source, Func<TCurrent, TNext> selector) =>
-            new(source.Span, new(source.Node.Predicate, selector));
 
         //- [ ] `IEnumerable<TResult> Select<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, TResult> selector);`
 
