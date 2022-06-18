@@ -13,6 +13,6 @@ public readonly ref struct SpanHost<TSource, TCurrent, TStreamNode>
     }
 
     public TResult Execute<TResult, TProcessStream>(in TProcessStream processStream)
-        where TProcessStream : struct, IProcessStream<TCurrent, TResult> =>
-        Node.Execute<TSource, TResult, TProcessStream>(Span, processStream);
+        where TProcessStream : struct, IProcessStream<TCurrent, TCurrent, TResult> =>
+        Node.Execute<TSource, TCurrent, TResult, TProcessStream>(Span, processStream);
 }

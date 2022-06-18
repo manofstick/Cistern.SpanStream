@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Cistern.Utils;
+using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
@@ -12,13 +13,13 @@ public readonly struct Select<T, U, NodeT>
     public Select(in NodeT nodeT, Func<T, U> selector) =>
         (Node, Selector) = (nodeT, selector);
 
-    TResult IStreamNode<U>.Execute<TRoot, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
-        Node.Execute<TRoot, TResult, SelectStream<T, U, TResult, TProcessStream>>(in span, new(in processStream, Selector));
+    TResult IStreamNode<U>.Execute<TRoot, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
+        Node.Execute<TRoot, TCurrent, TResult, SelectStream<T, U, TCurrent, TResult, TProcessStream>>(in span, new(in processStream, Selector));
 }
 
-struct SelectStream<T, U, TResult, TProcessStream>
-    : IProcessStream<T, TResult>
-    where TProcessStream : struct, IProcessStream<U, TResult>
+struct SelectStream<T, U, TCurrent, TResult, TProcessStream>
+    : IProcessStream<T, TCurrent, TResult>
+    where TProcessStream : struct, IProcessStream<U, TCurrent, TResult>
 {
     /* can't be readonly */ TProcessStream _next;
     readonly Func<T, U> _selector;
@@ -26,9 +27,9 @@ struct SelectStream<T, U, TResult, TProcessStream>
     public SelectStream(in TProcessStream nextProcessStream, Func<T, U> selector) =>
         (_next, _selector) = (nextProcessStream, selector);
 
-    TResult IProcessStream<T, TResult>.GetResult() => _next.GetResult();
+    TResult IProcessStream<T, TCurrent, TResult>.GetResult(ref Builder<TCurrent> builder) => _next.GetResult(ref builder);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<T>.ProcessNext(in T input) =>
-        _next.ProcessNext(_selector(input));
+    bool IProcessStream<T, TCurrent>.ProcessNext(ref Builder<TCurrent> builder, in T input) =>
+        _next.ProcessNext(ref builder, _selector(input));
 }

@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Cistern.Utils;
+using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
@@ -12,13 +13,13 @@ public readonly struct Where<T, NodeT>
     public Where(in NodeT nodeT, Func<T, bool> predicate) =>
         (Node, Predicate) = (nodeT, predicate);
 
-    TResult IStreamNode<T>.Execute<TRoot, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
-        Node.Execute<TRoot, TResult, WhereStream<T, TResult, TProcessStream>>(in span, new(in processStream, Predicate));
+    TResult IStreamNode<T>.Execute<TRoot, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
+        Node.Execute<TRoot, TCurrent, TResult, WhereStream<T, TCurrent, TResult, TProcessStream>>(in span, new(in processStream, Predicate));
 }
 
-struct WhereStream<T, TResult, TProcessStream>
-    : IProcessStream<T, TResult>
-    where TProcessStream : struct, IProcessStream<T, TResult>
+struct WhereStream<T, TCurrent, TResult, TProcessStream>
+    : IProcessStream<T, TCurrent, TResult>
+    where TProcessStream : struct, IProcessStream<T, TCurrent, TResult>
 {
     /* can't be readonly */ TProcessStream _next;
     readonly Func<T, bool> _predicate;
@@ -26,9 +27,9 @@ struct WhereStream<T, TResult, TProcessStream>
     public WhereStream(in TProcessStream nextProcessStream, Func<T, bool> predicate) =>
         (_next, _predicate) = (nextProcessStream, predicate);
 
-    TResult IProcessStream<T, TResult>.GetResult() => _next.GetResult();
+    TResult IProcessStream<T, TCurrent, TResult>.GetResult(ref Builder<TCurrent> builder) => _next.GetResult(ref builder);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<T>.ProcessNext(in T input) =>
-        !_predicate(input) || _next.ProcessNext(input);
+    bool IProcessStream<T, TCurrent>.ProcessNext(ref Builder<TCurrent> builder, in T input) =>
+        !_predicate(input) || _next.ProcessNext(ref builder, input);
 }

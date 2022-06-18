@@ -1,18 +1,20 @@
-﻿namespace Cistern.SpanStream;
+﻿using Cistern.Utils;
 
-public interface IProcessStream<TElement>
+namespace Cistern.SpanStream;
+
+public interface IProcessStream<TElement, TCurrent>
 {
-    public bool ProcessNext(in TElement input);
+    public bool ProcessNext(ref Builder<TCurrent> builder, in TElement input);
 }
 
-public interface IProcessStream<TElement, TResult>
-    : IProcessStream<TElement>
+public interface IProcessStream<TElement, TCurrent, TResult>
+    : IProcessStream<TElement, TCurrent>
 {
-    TResult GetResult();
+    TResult GetResult(ref Builder<TCurrent> builder);
 }
 
 public interface IStreamNode<TSource>
 {
-    TResult Execute<TRoot, TResult, TNextInChain>(in ReadOnlySpan<TRoot> span, in TNextInChain fenum)
-        where TNextInChain : struct, IProcessStream<TSource, TResult>;
+    TResult Execute<TRoot, TCurrent, TResult, TNextInChain>(in ReadOnlySpan<TRoot> span, in TNextInChain fenum)
+        where TNextInChain : struct, IProcessStream<TSource, TCurrent, TResult>;
 }

@@ -215,7 +215,11 @@ namespace Cistern.SpanStream
         //- [ ] `IOrderedEnumerable<TSource> ThenBy<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
         //- [ ] `IOrderedEnumerable<TSource> ThenByDescending<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector);`
         //- [ ] `IOrderedEnumerable<TSource> ThenByDescending<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
-        //- [ ] `TSource[] ToArray<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
+
+        public static TCurrent[] ToArray<TRoot, TCurrent, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source)
+            where TNode : struct, IStreamNode<TCurrent> =>
+            source.Execute<TCurrent[], ToArray<TCurrent>>(new ());
+
         //- [ ] `Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector) where TKey : notnull;`
         //- [ ] `Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
         //- [ ] `Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) where TKey : notnull;`

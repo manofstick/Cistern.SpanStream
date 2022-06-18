@@ -3,6 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Cistern.SpanStream;
+using System.Collections.Immutable;
 
 namespace Benchmarks;
 
@@ -100,52 +101,70 @@ public class FirstTest
         _asArray = new byte[N];
         new Random(42).NextBytes(_asArray);
         data = _asArray;
-         
-        var a = Manual();
-        var b = SpanStream();
-        var c = Linq();
-        if (a != b || a != c)
-            throw new Exception("failed validation");
+
+        Func<int[]>[] tests = new Func<int[]>[]
+        {
+            Manual,
+            SpanStream,
+            Linq
+        };
+
+        var baseline = tests[0]();
+        for (var i=1; i < tests.Length; ++i)
+        {
+            var check = tests[i]();
+            Validate(baseline, check);
+        }
+    }
+    private static void Validate(int[] baseline, int[] check)
+    {
+        if (!baseline.SequenceEqual(check))
+            throw new Exception("Validation error");
     }
 
     [Benchmark]
-    public int Manual()
+    public int[] Manual()
     {
-        var accumulate = 0;
+        var x = ImmutableArray.CreateBuilder<int>();
+        //var accumulate = 0;
         foreach(var item in data.Span)
         {
             int i = item;
-            if (i < 250)
+            //if (i < 250)
             {
                 if (i > 128)
                 {
-                    accumulate += i * 2;
+                    //accumulate += i * 2;
+                    x.Add(i * 2);
                 }
             }
         }
-        return accumulate;
+        //return accumulate;
+        return x.ToArray();
     }
 
     [Benchmark]
-    public int SpanStream()
+    public int[] SpanStream()
     {
         return
             data.Span
-            .Where(x => x < 250)
+//            .Where(x => x < 250)
             .Where(x => x > 128)
             .Select(x => x * 2)
-            .Aggregate(0, (a, c) => a + c);
+            .ToArray();
+//            .Aggregate(0, (a, c) => a + c);
     }
 
     [Benchmark]
-    public int Linq()
+    public int[] Linq()
     {
         return
             _asArray
-            .Where(x => x < 250)
+            //            .Where(x => x < 250)
             .Where(x => x > 128)
             .Select(x => x * 2)
-            .Aggregate(0, (a, c) => a + c);
+            .ToArray();
+//            .Aggregate(0, (a, c) => a + c);
     }
 }
 
