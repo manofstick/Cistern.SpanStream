@@ -45,6 +45,26 @@ where-select
 | SpanStream | 10000 |  87,952.950 ns | 351.3591 ns | 311.4707 ns |  87,897.699 ns |      - |         - |
 |       Linq | 10000 | 101,768.123 ns | 312.2823 ns | 292.1090 ns | 101,551.819 ns |      - |     104 B |
 
+select-where
+
+|     Method |     N |           Mean |      Error |     StdDev |  Gen 0 | Allocated |
+|----------- |------ |---------------:|-----------:|-----------:|-------:|----------:|
+|     Manual |     0 |       4.960 ns |  0.0272 ns |  0.0254 ns |      - |         - |
+| SpanStream |     0 |      29.400 ns |  0.0296 ns |  0.0231 ns |      - |         - |
+|       Linq |     0 |      68.947 ns |  0.1348 ns |  0.1125 ns | 0.0134 |      56 B |
+|     Manual |     1 |       5.346 ns |  0.0375 ns |  0.0351 ns |      - |         - |
+| SpanStream |     1 |      32.339 ns |  0.1351 ns |  0.1197 ns |      - |         - |
+|       Linq |     1 |      80.247 ns |  0.2980 ns |  0.2489 ns | 0.0248 |     104 B |
+|     Manual |    10 |      51.821 ns |  0.1669 ns |  0.1479 ns |      - |         - |
+| SpanStream |    10 |     126.330 ns |  1.1163 ns |  1.0442 ns |      - |         - |
+|       Linq |    10 |     208.433 ns |  1.0826 ns |  0.9597 ns | 0.0248 |     104 B |
+|     Manual |   100 |     327.587 ns |  1.0508 ns |  0.9829 ns |      - |         - |
+| SpanStream |   100 |     875.638 ns |  2.8894 ns |  2.5614 ns |      - |         - |
+|       Linq |   100 |   1,277.314 ns |  5.9211 ns |  5.5386 ns | 0.0248 |     104 B |
+|     Manual | 10000 |  34,516.571 ns | 76.6347 ns | 63.9935 ns |      - |         - |
+| SpanStream | 10000 |  87,071.903 ns | 14.7107 ns | 13.0407 ns |      - |         - |
+|       Linq | 10000 | 123,752.885 ns | 58.5278 ns | 45.6946 ns |      - |     104 B |
+
 */
 
 [Config(typeof(MyEnvVars))]
@@ -94,13 +114,10 @@ public class FirstTest
         var accumulate = 0;
         foreach(var item in data.Span)
         {
-            int i = item;
+            int i = item * 2;
             if (i > 128)
             {
-                i *= 2;
-                i *= 2;
-                if (i < 500)
-                    accumulate += item;
+                accumulate += i;
             }
         }
         return accumulate;
@@ -111,10 +128,8 @@ public class FirstTest
     {
         return
             data.Span
+            .Select(x => x * 2)
             .Where(x => x > 128)
-            .Select(x => x * 2)
-            .Select(x => x * 2)
-            .Where(x => x < 500)
             .Aggregate(0, (a, c) => a + c);
     }
 
@@ -123,10 +138,8 @@ public class FirstTest
     {
         return
             _asArray
+            .Select(x => x * 2)
             .Where(x => x > 128)
-            .Select(x => x * 2)
-            .Select(x => x * 2)
-            .Where(x => x < 500)
             .Aggregate(0, (a, c) => a + c);
     }
 }

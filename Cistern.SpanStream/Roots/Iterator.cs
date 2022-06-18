@@ -25,7 +25,21 @@
             }
         }
 
-        internal static void Select<TSource, TProcessStream, TNext>(Span<TSource> span, ref TProcessStream stream, Func<TSource, TNext> selector)
+        internal static void SelectWhere<TSource, TNext, TProcessStream>(Span<TSource> span, ref TProcessStream stream, Func<TSource, TNext> selector, Func<TNext, bool> predicate)
+            where TProcessStream : struct, IProcessStream<TNext>
+        {
+            for (var i = 0; i < span.Length; ++i)
+            {
+                var next = selector(span[i]);
+                if (predicate(next))
+                {
+                    if (!stream.ProcessNext(next))
+                        break;
+                }
+            }
+        }
+
+        internal static void Select<TSource, TNext, TProcessStream>(Span<TSource> span, ref TProcessStream stream, Func<TSource, TNext> selector)
             where TProcessStream : struct, IProcessStream<TNext>
         {
             for (var i = 0; i < span.Length; ++i)
@@ -35,7 +49,7 @@
             }
         }
 
-        internal static void WhereSelect<TSource, TProcessStream, TNext>(Span<TSource> span, ref TProcessStream stream, Func<TSource, bool> predicate, Func<TSource, TNext> selector)
+        internal static void WhereSelect<TSource, TNext, TProcessStream>(Span<TSource> span, ref TProcessStream stream, Func<TSource, bool> predicate, Func<TSource, TNext> selector)
             where TProcessStream : struct, IProcessStream<TNext>
         {
             for (var i = 0; i < span.Length; ++i)

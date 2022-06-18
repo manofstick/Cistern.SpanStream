@@ -2,20 +2,21 @@
 
 namespace Cistern.SpanStream.Roots;
 
-public readonly struct SelectRoot<TSource, TNext>
+public readonly struct SelectWhereRoot<TSource, TNext>
     : IStreamNode<TNext>
 {
-    public Func<TSource, TNext> Selector { get; }
+    readonly Func<TSource, TNext> _selector;
+    readonly Func<TNext, bool> _predicate;
 
-    public SelectRoot(Func<TSource, TNext> selector) =>
-        (Selector) = (selector);
+    public SelectWhereRoot(Func<TSource, TNext> selector, Func<TNext, bool> predicate) =>
+        (_predicate, _selector) = (predicate, selector);
 
     TResult IStreamNode<TNext>.Execute<TSourceDuplicate, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
 
         var localCopy = processStream;
-        Iterator.Select(span, ref localCopy, Selector);
+        Iterator.SelectWhere(span, ref localCopy, _selector, _predicate);
         return localCopy.GetResult();
     }
 }
