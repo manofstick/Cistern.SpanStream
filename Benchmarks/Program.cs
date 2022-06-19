@@ -124,7 +124,7 @@ public class FirstTest
         new Random(42).NextBytes(_asArray);
         data = _asArray;
 
-        Func<int>[] tests = new Func<int>[]
+        var tests = new Func<int[]>[]
         {
             Manual,
             SpanStream,
@@ -138,7 +138,7 @@ public class FirstTest
             Validate(baseline, check);
         }
     }
-    private static void Validate(int[] baseline, int[] check)
+    private static void Validate<T>(T[] baseline, T[] check)
     {
         if (!baseline.SequenceEqual(check))
             throw new Exception("Validation error");
@@ -151,50 +151,51 @@ public class FirstTest
     }
 
     [Benchmark]
-    public int Manual()
+    public int[] Manual()
     {
-        //var x = ImmutableArray.CreateBuilder<int>();
+        var x = ImmutableArray.CreateBuilder<int>();
         //var x = new int[data.Length];
         //var idx = 0;
-        var accumulate = 0;
+        //var accumulate = 0;
         foreach(var item in data.Span)
         {
-            int i = item * 2;
+            byte i = item ;
             //if (i < 250)
             {
                 if (i > 128)
                 {
-                    accumulate += i;
+                    //accumulate += i;
                     //x[idx++] = (i * 2);
+                    x.Add(i * 2);
                 }
             }
         }
-        return accumulate;
-//        return x;
+//        return accumulate;
+        return x.ToArray();
     }
 
     [Benchmark]
-    public int SpanStream()
+    public int[] SpanStream()
     {
         return
             data.Span
 //            .Where(x => x < 250)
-            .Select(x => x * 2)
             .Where(x => x > 128)
-            //            .ToArray();
-            .Aggregate(0, (a, c) => a + c);
+                                    .Select(x => x * 2)
+                        .ToArray();
+            //.Aggregate(0, (a, c) => a + c);
     }
 
     [Benchmark]
-    public int Linq()
+    public int[] Linq()
     {
         return
             _asArray
             //            .Where(x => x < 250)
-            .Select(x => x * 2)
             .Where(x => x > 128)
-            //            .ToArray();
-            .Aggregate(0, (a, c) => a + c);
+                                    .Select(x => x * 2)
+                        .ToArray();
+            //.Aggregate(0, (a, c) => a + c);
     }
 }
 
@@ -222,7 +223,7 @@ public class Program
         //Cistern.Utils.StackAllocator.Allocate<int>(100);
 
         var zz = new FirstTest();
-        zz.N = 10;
+        zz.N = 100;
         zz.GlobalSetup();
 
         //return;

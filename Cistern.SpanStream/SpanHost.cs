@@ -15,7 +15,7 @@ public readonly ref struct SpanHost<TInitial, TCurrent, TStreamNode>
     public int? TryGetSize(out int upperBound) =>
         Node.TryGetSize(Span.Length, out upperBound);
 
-    public TResult Execute<TResult, TProcessStream>(in TProcessStream processStream)
+    public TResult Execute<TResult, TProcessStream>(in TProcessStream finalNode, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TCurrent, TCurrent, TResult> =>
-        Node.Execute<TInitial, TCurrent, TResult, TProcessStream>(Span, processStream);
+        Node.Execute<TInitial, TCurrent, TResult, TProcessStream>(Span, stackAllocationCount, finalNode);
 }

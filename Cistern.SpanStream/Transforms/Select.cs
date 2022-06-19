@@ -15,8 +15,8 @@ public readonly struct Select<TInput, TOutput, TPriorNode>
 
     int? IStreamNode<TOutput>.TryGetSize(int sourceSize, out int upperBound) => Node.TryGetSize(sourceSize, out upperBound);
 
-    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, in TProcessStream processStream) =>
-        Node.Execute<TInitialDuplicate, TFinal, TResult, SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, new(in processStream, Selector));
+    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
+        Node.Execute<TInitialDuplicate, TFinal, TResult, SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Selector));
 }
 
 struct SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>

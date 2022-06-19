@@ -20,8 +20,8 @@ public readonly struct WhereSelect<TInput, TOutput, TPriorNode>
         return 0;
     }
 
-    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, in TProcessStream processStream) =>
-        Node.Execute<TInitialDuplicate, TFinal, TResult, WhereSelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, new(in processStream, Predicate, Selector));
+    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
+        Node.Execute<TInitialDuplicate, TFinal, TResult, WhereSelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Predicate, Selector));
 }
 
 struct WhereSelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>

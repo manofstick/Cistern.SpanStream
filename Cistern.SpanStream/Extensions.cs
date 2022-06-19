@@ -223,7 +223,7 @@ namespace Cistern.SpanStream
             if (maybeSize.HasValue)
                 return source.Execute<TCurrent[], ToArrayKnownSize<TCurrent>>(new(new TCurrent[maybeSize.Value]));
 
-            return source.Execute<TCurrent[], ToArray<TCurrent>>(new());
+            return source.Execute<TCurrent[], ToArray<TCurrent>>(new(), source.Span.Length);
         }
 
         public static TCurrent[] ToArray<TInitial, TCurrent>(this in SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source)
