@@ -1,58 +1,96 @@
-﻿using System.Buffers;
+﻿using Cistern.SpanStream;
+using System.Buffers;
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 
 namespace Cistern.Utils;
 
-public ref struct Builder<T>
+internal static class StackAllocator
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public ref struct Elements
+    public struct BufferStorage<T>
     {
-        public T _01;
-        public T _02;
-        public T _03;
-        public T _04;
-        public T _05;
-        public T _06;
-        public T _07;
-        public T _08;
-        public T _09;
-        public T _10;
-        public T _11;
-        public T _12;
-        public T _13;
-        public T _14;
-        public T _15;
-        public T _16;
-        public T _17;
-        public T _18;
-        public T _19;
-        public T _20;
-        public T _21;
-        public T _22;
-        public T _23;
-        public T _24;
-        public T _25;
-        public T _26;
-        public T _27;
-        public T _28;
-        public T _29;
-        public T _30;
+        public T[] _01;
+        public T[] _02;
+        public T[] _03;
+        public T[] _04;
+        public T[] _05;
+        public T[] _06;
+        public T[] _07;
+        public T[] _08;
+        public T[] _09;
+        public T[] _10;
+        public T[] _11;
+        public T[] _12;
+        public T[] _13;
+        public T[] _14;
+        public T[] _15;
+        public T[] _16;
+        public T[] _17;
+        public T[] _18;
+        public T[] _19;
+        public T[] _20;
+        public T[] _21;
+        public T[] _22;
+        public T[] _23;
+        public T[] _24;
+        public T[] _25;
+        public T[] _26;
+        public T[] _27;
+        public T[] _28;
+        public T[] _29;
+        public T[] _30;
 
         public const int NumberOfElements = 30;
     }
 
-
-    public ref struct MemoryChunk
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct SequentialDataPair<T>
     {
-        private Elements BufferOfItems;
-        private Builder<T[]?>.Elements BufferOfBuffers;
-
-        public Span<T> GetBufferOfItems() => MemoryMarshal.CreateSpan(ref BufferOfItems._01, Elements.NumberOfElements);
-        public Span<T[]?> GetBufferofBuffers() => MemoryMarshal.CreateSpan(ref BufferOfBuffers._01, Builder<T[]?>.Elements.NumberOfElements);
+        public T Item1;
+        public T Item2;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct MemoryChunk<T, TChunk>
+        where TChunk : struct
+    {
+        public T Head;
+        public TChunk Tail;
+    }
+
+    static void Allocate<T, Chunk>(int requiredSize, int currentSize)
+        where Chunk : struct
+    {
+        MemoryChunk<T, Chunk> chunkOfStackSpace = default;
+
+        var span = MemoryMarshal.CreateSpan(ref chunkOfStackSpace.Head, currentSize);
+    }
+
+    static void BuildStackObject<T, Chunk>(int requiredSize, int currentSize)
+        where Chunk:struct
+    {
+        var nextSizeUp = ((currentSize - 1) * 2) + 1;
+
+        if (currentSize < requiredSize)
+            BuildStackObject<T, SequentialDataPair<Chunk>>(requiredSize, nextSizeUp);
+        else
+            Allocate<T, Chunk>(requiredSize, currentSize);
+    }
+
+    public static TResult Execute<TSource, TNext, TCurrent, TResult, TProcessStream, TState, TExecution>(int requiredSize, ref Span<TSource> span, in TProcessStream stream, in TState state)
+        where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
+        where TExecution : struct, IExecuteIterator<TSource, TNext, TState>
+    {
+        Builder<TCurrent> builder = default;
+
+        return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref builder, ref span, in stream, in state);
+    }
+}
+
+
+public ref struct Builder<T>
+{
     readonly ArrayPool<T>? _maybePool;
     readonly Span<T> _root;
     readonly int? _upperBound;

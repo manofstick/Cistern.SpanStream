@@ -18,14 +18,21 @@ public readonly struct WhereSelectRoot<TSource, TNext>
         return null;
     }
 
+    struct Execute
+        : IExecuteIterator<TSource, TNext, (Func<TSource, bool> Predicate, Func<TSource, TNext> Selector)>
+    {
+        TResult IExecuteIterator<TSource, TNext, (Func<TSource, bool> Predicate, Func<TSource, TNext> Selector)>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TSource> span, in TProcessStream stream, in (Func<TSource, bool> Predicate, Func<TSource, TNext> Selector) state)
+        {
+            var localCopy = stream;
+            Iterator.WhereSelect(ref builder, span, ref localCopy, state.Predicate, state.Selector);
+            return localCopy.GetResult(ref builder);
+        }
+    }
+
     TResult IStreamNode<TNext>.Execute<TSourceDuplicate, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
 
-        Builder<TCurrent>.MemoryChunk memoryChunk = new();
-        var builder = new Builder<TCurrent>(null, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), null);
-        var localCopy = processStream;
-        Iterator.WhereSelect(ref builder, span, ref localCopy, _predicate, _selector);
-        return localCopy.GetResult(ref builder);
+        return StackAllocator.Execute<TSource, TNext, TCurrent, TResult, TProcessStream, (Func<TSource, bool> Predicate, Func<TSource, TNext> Selector), Execute>(0, ref span, in processStream, (_predicate, _selector));
     }
 }

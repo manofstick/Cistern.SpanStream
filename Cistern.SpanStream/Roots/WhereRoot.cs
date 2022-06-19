@@ -16,14 +16,21 @@ public readonly struct WhereRoot<TSource>
         return null;
     }
 
+    struct Execute
+        : IExecuteIterator<TSource, TSource, Func<TSource, bool>>
+    {
+        TResult IExecuteIterator<TSource, TSource, Func<TSource, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TSource> span, in TProcessStream stream, in Func<TSource, bool> predicate)
+        {
+            var localCopy = stream;
+            Iterator.Where(ref builder, span, ref localCopy, predicate);
+            return localCopy.GetResult(ref builder);
+        }
+    }
+
     TResult IStreamNode<TSource>.Execute<TSourceDuplicate, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
 
-        Builder<TCurrent>.MemoryChunk memoryChunk = new();
-        var builder = new Builder<TCurrent>(null, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), null);
-        var localCopy = processStream;
-        Iterator.Where(ref builder, span, ref localCopy, Predicate);
-        return localCopy.GetResult(ref builder);
+        return StackAllocator.Execute<TSource, TSource, TCurrent, TResult, TProcessStream, Func<TSource, bool>, Execute>(0, ref span, in processStream, Predicate);
     }
 }
