@@ -7,6 +7,13 @@ namespace Cistern.Utils;
 
 internal static class StackAllocator
 {
+    internal interface IAfterAllocation<TInitial, TNext, TState>
+    {
+        TResult Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> builder, ref Span<TInitial> span, in TProcessStream stream, in TState state)
+            where TProcessStream : struct, IProcessStream<TNext, TFinal, TResult>;
+    }
+
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BufferStorage<T>
     {
@@ -61,7 +68,7 @@ internal static class StackAllocator
 
     static TResult AllocateAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(ref Span<TInitial> span, in TProcessStream stream, in TArgs args, int requiredSize, int currentSize)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
-        where TExecution : struct, IExecuteIterator<TInitial, TNext, TArgs>
+        where TExecution : struct, IAfterAllocation<TInitial, TNext, TArgs>
         where TCurrentChunk : struct
     {
         MemoryChunk<TCurrent, TCurrentChunk> chunkOfStackSpace = default;
@@ -76,7 +83,7 @@ internal static class StackAllocator
 
     static TResult BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(ref Span<TInitial> span, in TProcessStream stream, in TArgs args, int requiredSize, int currentSize)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
-        where TExecution : struct, IExecuteIterator<TInitial, TNext, TArgs>
+        where TExecution : struct, IAfterAllocation<TInitial, TNext, TArgs>
         where TCurrentChunk :struct
     {
         var nextSizeUp = ((currentSize - 1) * 2) + 1;
@@ -89,7 +96,7 @@ internal static class StackAllocator
 
     public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution>(int? stackAllocationCount, ref Span<TInitial> span, in TProcessStream stream, in TArgs args)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
-        where TExecution : struct, IExecuteIterator<TInitial, TNext, TArgs>
+        where TExecution : struct, IAfterAllocation<TInitial, TNext, TArgs>
     {
         if (stackAllocationCount > 0)
         {

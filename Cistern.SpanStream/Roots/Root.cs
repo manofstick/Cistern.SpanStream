@@ -15,9 +15,9 @@ public readonly struct Root<TInitial>
     struct Null { }
 
     struct Execute
-        : IExecuteIterator<TInitial, TInitial, Null>
+        : StackAllocator.IAfterAllocation<TInitial, TInitial, Null>
     {
-        TResult IExecuteIterator<TInitial, TInitial, Null>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> builder, ref Span<TInitial> span, in TProcessStream stream, in Null selector)
+        TResult StackAllocator.IAfterAllocation<TInitial, TInitial, Null>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> builder, ref Span<TInitial> span, in TProcessStream stream, in Null selector)
         {
             var localCopy = stream;
             Iterator.Vanilla(ref builder, span, ref localCopy);

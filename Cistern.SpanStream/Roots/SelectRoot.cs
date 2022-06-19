@@ -19,9 +19,9 @@ public readonly struct SelectRoot<TInput, TOutput>
     }
 
     struct Execute
-        : IExecuteIterator<TInput, TOutput, Func<TInput, TOutput>>
+        : StackAllocator.IAfterAllocation<TInput, TOutput, Func<TInput, TOutput>>
     {
-        TResult IExecuteIterator<TInput, TOutput, Func<TInput, TOutput>>.Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> state, ref Span<TInput> span, in TProcessStream stream, in Func<TInput, TOutput> selector)
+        TResult StackAllocator.IAfterAllocation<TInput, TOutput, Func<TInput, TOutput>>.Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> state, ref Span<TInput> span, in TProcessStream stream, in Func<TInput, TOutput> selector)
         {
             var localCopy = stream;
             Iterator.Select(ref state, span, ref localCopy, selector);

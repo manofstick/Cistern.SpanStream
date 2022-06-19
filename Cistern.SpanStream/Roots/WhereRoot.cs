@@ -17,9 +17,9 @@ public readonly struct WhereRoot<T>
     }
 
     struct Execute
-        : IExecuteIterator<T, T, Func<T, bool>>
+        : StackAllocator.IAfterAllocation<T, T, Func<T, bool>>
     {
-        TResult IExecuteIterator<T, T, Func<T, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<T> span, in TProcessStream stream, in Func<T, bool> predicate)
+        TResult StackAllocator.IAfterAllocation<T, T, Func<T, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<T> span, in TProcessStream stream, in Func<T, bool> predicate)
         {
             var localCopy = stream;
             Iterator.Where(ref state, span, ref localCopy, predicate);

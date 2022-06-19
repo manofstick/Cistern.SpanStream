@@ -19,9 +19,9 @@ public readonly struct WhereSelectRoot<TInput, TOutput>
     }
 
     struct Execute
-        : IExecuteIterator<TInput, TOutput, (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector)>
+        : StackAllocator.IAfterAllocation<TInput, TOutput, (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector)>
     {
-        TResult IExecuteIterator<TInput, TOutput, (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector)>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<TInput> span, in TProcessStream stream, in (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector) args)
+        TResult StackAllocator.IAfterAllocation<TInput, TOutput, (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector)>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<TInput> span, in TProcessStream stream, in (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector) args)
         {
             var localCopy = stream;
             Iterator.WhereSelect(ref state, span, ref localCopy, args.Predicate, args.Selector);
