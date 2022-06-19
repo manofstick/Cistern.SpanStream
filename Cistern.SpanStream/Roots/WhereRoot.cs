@@ -19,7 +19,7 @@ public readonly struct WhereRoot<T>
     struct Execute
         : StackAllocator.IAfterAllocation<T, T, Func<T, bool>>
     {
-        TResult StackAllocator.IAfterAllocation<T, T, Func<T, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<T> span, in TProcessStream stream, in Func<T, bool> predicate)
+        TResult StackAllocator.IAfterAllocation<T, T, Func<T, bool>>.Execute<TTerminatorState, TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent, TTerminatorState> state, ref Span<T> span, in TProcessStream stream, in Func<T, bool> predicate)
         {
             var localCopy = stream;
             Iterator.Where(ref state, span, ref localCopy, predicate);
@@ -27,10 +27,10 @@ public readonly struct WhereRoot<T>
         }
     }
 
-    TResult IStreamNode<T>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
+    TResult IStreamNode<T>.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TInitialDuplicate, T>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<T, T, TFinal, TResult, TProcessStream, Func<T, bool>, Execute>(stackAllocationCount, ref span, in processStream, Predicate);
+        return StackAllocator.Execute<TTerminatorState, T, T, TFinal, TResult, TProcessStream, Func<T, bool>, Execute>(stackAllocationCount, ref span, in processStream, Predicate);
     }
 }

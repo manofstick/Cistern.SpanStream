@@ -15,7 +15,7 @@ namespace Cistern.SpanStream
 
         public static TAccumulate Aggregate<TInitial, TCurrent, TNode, TAccumulate>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TCurrent, TAccumulate> func)
             where TNode : struct, IStreamNode<TCurrent> =>
-            source.Execute<TAccumulate, Aggregate<TCurrent, TAccumulate>>(new(func, seed));
+            source.Execute<AggregationState, TAccumulate, Aggregate<TCurrent, TAccumulate>>(new(func, seed));
 
         //- [ ] `TResult Aggregate<TInitial, TAccumulate, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TInitial, TAccumulate> func, Func<TAccumulate, TResult> resultSelector);`
         //- [ ] `bool All<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
@@ -221,9 +221,9 @@ namespace Cistern.SpanStream
         {
             var maybeSize = source.TryGetSize(out var upperBound);
             if (maybeSize.HasValue)
-                return source.Execute<TCurrent[], ToArrayKnownSize<TCurrent>>(new(new TCurrent[maybeSize.Value]));
+                return source.Execute<TempState, TCurrent[], ToArrayKnownSize<TCurrent>>(new(new TCurrent[maybeSize.Value]));
 
-            return source.Execute<TCurrent[], ToArray<TCurrent>>(new(), source.Span.Length);
+            return source.Execute<ToArrayState<TCurrent>, TCurrent[], ToArray<TCurrent>>(new(), source.Span.Length);
         }
 
         public static TCurrent[] ToArray<TInitial, TCurrent>(this in SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source)

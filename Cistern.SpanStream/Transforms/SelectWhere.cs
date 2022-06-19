@@ -20,13 +20,13 @@ public readonly struct SelectWhere<TInput, TOutput, TPriorNode>
         return 0;
     }
 
-    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
-        Node.Execute<TInitialDuplicate, TFinal, TResult, SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Selector, Predicate));
+    TResult IStreamNode<TOutput>.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
+        Node.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, SelectWhereStream<TTerminatorState, TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Selector, Predicate));
 }
 
-struct SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>
-    : IProcessStream<TInput, TFinal, TResult>
-    where TProcessStream : struct, IProcessStream<TOutput, TFinal, TResult>
+struct SelectWhereStream<TTerminatorState, TInput, TOutput, TFinal, TResult, TProcessStream>
+    : IProcessStream<TTerminatorState, TInput, TFinal, TResult>
+    where TProcessStream : struct, IProcessStream<TTerminatorState, TOutput, TFinal, TResult>
 {
     /* can't be readonly */ TProcessStream _next;
     readonly Func<TInput, TOutput> _selector;
@@ -35,10 +35,10 @@ struct SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>
     public SelectWhereStream(in TProcessStream nextProcessStream, Func<TInput, TOutput> selector, Func<TOutput, bool> predicate) =>
         (_next, _selector, _predicate) = (nextProcessStream, selector, predicate);
 
-    TResult IProcessStream<TInput, TFinal, TResult>.GetResult(ref StreamState<TFinal> state) => _next.GetResult(ref state);
+    TResult IProcessStream<TTerminatorState, TInput, TFinal, TResult>.GetResult(ref StreamState<TFinal, TTerminatorState> state) => _next.GetResult(ref state);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TInput, TFinal>.ProcessNext(ref StreamState<TFinal> state, in TInput input)
+    bool IProcessStream<TTerminatorState, TInput, TFinal>.ProcessNext(ref StreamState<TFinal, TTerminatorState> state, in TInput input)
     {
         var u = _selector(input);
         if (_predicate(u))

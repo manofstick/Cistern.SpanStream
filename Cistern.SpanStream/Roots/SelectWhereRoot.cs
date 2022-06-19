@@ -21,7 +21,7 @@ public readonly struct SelectWhereRoot<TInput, TOutput>
     struct Execute
         : StackAllocator.IAfterAllocation<TInput, TOutput, (Func<TInput, TOutput> Selector, Func<TOutput, bool> Predicate)>
     {
-        TResult StackAllocator.IAfterAllocation<TInput, TOutput, (Func<TInput, TOutput> Selector, Func<TOutput, bool> Predicate)>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<TInput> span, in TProcessStream stream, in (Func<TInput, TOutput> Selector, Func<TOutput, bool> Predicate) args)
+        TResult StackAllocator.IAfterAllocation<TInput, TOutput, (Func<TInput, TOutput> Selector, Func<TOutput, bool> Predicate)>.Execute<TTerminatorState, TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent, TTerminatorState> state, ref Span<TInput> span, in TProcessStream stream, in (Func<TInput, TOutput> Selector, Func<TOutput, bool> Predicate) args)
         {
             var localCopy = stream;
             Iterator.SelectWhere(ref state, span, ref localCopy, args.Selector, args.Predicate);
@@ -29,10 +29,10 @@ public readonly struct SelectWhereRoot<TInput, TOutput>
         }
     }
 
-    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
+    TResult IStreamNode<TOutput>.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TInitialDuplicate, TInput>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<TInput, TOutput, TFinal, TResult, TProcessStream, (Func<TInput, TOutput> Selector, Func<TOutput, bool> Predicate), Execute>(stackAllocationCount, ref span, in processStream, (_selector, _predicate));
+        return StackAllocator.Execute<TTerminatorState, TInput, TOutput, TFinal, TResult, TProcessStream, (Func<TInput, TOutput> Selector, Func<TOutput, bool> Predicate), Execute>(stackAllocationCount, ref span, in processStream, (_selector, _predicate));
     }
 }

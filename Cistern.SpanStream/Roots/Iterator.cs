@@ -4,8 +4,8 @@ namespace Cistern.SpanStream.Roots
 {
     internal static class Iterator
     {
-        public static void Vanilla<TInitial, TFinal, TProcessStream>(ref StreamState<TFinal> state, Span<TInitial> span, ref TProcessStream stream)
-            where TProcessStream : struct, IProcessStream<TInitial, TFinal>
+        public static void Vanilla<TTerminatorState, TInitial, TFinal, TProcessStream>(ref StreamState<TFinal, TTerminatorState> state, Span<TInitial> span, ref TProcessStream stream)
+            where TProcessStream : struct, IProcessStream<TTerminatorState, TInitial, TFinal>
         {
             for (var i = 0; i < span.Length; ++i)
             {
@@ -14,8 +14,8 @@ namespace Cistern.SpanStream.Roots
             }
         }
 
-        internal static void Where<TInitial, TFinal, TProcessStream>(ref StreamState<TFinal> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, bool> predicate)
-            where TProcessStream : struct, IProcessStream<TInitial, TFinal>
+        internal static void Where<TTerminatorState, TInitial, TFinal, TProcessStream>(ref StreamState<TFinal, TTerminatorState> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, bool> predicate)
+            where TProcessStream : struct, IProcessStream<TTerminatorState, TInitial, TFinal>
         {
             for (var i = 0; i < span.Length; ++i)
             {
@@ -27,8 +27,8 @@ namespace Cistern.SpanStream.Roots
             }
         }
 
-        internal static void SelectWhere<TInitial, TFinal, TNext, TProcessStream>(ref StreamState<TFinal> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, TNext> selector, Func<TNext, bool> predicate)
-            where TProcessStream : struct, IProcessStream<TNext, TFinal>
+        internal static void SelectWhere<TTerminatorState, TInitial, TFinal, TNext, TProcessStream>(ref StreamState<TFinal, TTerminatorState> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, TNext> selector, Func<TNext, bool> predicate)
+            where TProcessStream : struct, IProcessStream<TTerminatorState, TNext, TFinal>
         {
             for (var i = 0; i < span.Length; ++i)
             {
@@ -41,8 +41,8 @@ namespace Cistern.SpanStream.Roots
             }
         }
 
-        internal static void Select<TInitial, TFinal, TNext, TProcessStream>(ref StreamState<TFinal> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, TNext> selector)
-            where TProcessStream : struct, IProcessStream<TNext, TFinal>
+        internal static void Select<TTerminatorState, TInitial, TFinal, TNext, TProcessStream>(ref StreamState<TFinal, TTerminatorState> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, TNext> selector)
+            where TProcessStream : struct, IProcessStream<TTerminatorState, TNext, TFinal>
         {
             for (var i = 0; i < span.Length; ++i)
             {
@@ -51,8 +51,8 @@ namespace Cistern.SpanStream.Roots
             }
         }
 
-        internal static void WhereSelect<TInitial, TFinal, TNext, TProcessStream>(ref StreamState<TFinal> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, bool> predicate, Func<TInitial, TNext> selector)
-            where TProcessStream : struct, IProcessStream<TNext, TFinal>
+        internal static void WhereSelect<TTerminatorState, TInitial, TFinal, TNext, TProcessStream>(ref StreamState<TFinal, TTerminatorState> state, Span<TInitial> span, ref TProcessStream stream, Func<TInitial, bool> predicate, Func<TInitial, TNext> selector)
+            where TProcessStream : struct, IProcessStream<TTerminatorState, TNext, TFinal>
         {
             for (var i = 0; i < span.Length; ++i)
             {

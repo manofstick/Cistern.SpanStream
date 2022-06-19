@@ -21,7 +21,7 @@ public readonly struct SelectRoot<TInput, TOutput>
     struct Execute
         : StackAllocator.IAfterAllocation<TInput, TOutput, Func<TInput, TOutput>>
     {
-        TResult StackAllocator.IAfterAllocation<TInput, TOutput, Func<TInput, TOutput>>.Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> state, ref Span<TInput> span, in TProcessStream stream, in Func<TInput, TOutput> selector)
+        TResult StackAllocator.IAfterAllocation<TInput, TOutput, Func<TInput, TOutput>>.Execute<TTerminatorState, TFinal, TResult, TProcessStream>(ref StreamState<TFinal, TTerminatorState> state, ref Span<TInput> span, in TProcessStream stream, in Func<TInput, TOutput> selector)
         {
             var localCopy = stream;
             Iterator.Select(ref state, span, ref localCopy, selector);
@@ -29,10 +29,10 @@ public readonly struct SelectRoot<TInput, TOutput>
         }
     }
 
-    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
+    TResult IStreamNode<TOutput>.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TInitialDuplicate, TInput>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<TInput, TOutput, TFinal, TResult, TProcessStream, Func<TInput, TOutput>, Execute>(stackAllocationCount, ref span, in processStream, Selector);
+        return StackAllocator.Execute<TTerminatorState, TInput, TOutput, TFinal, TResult, TProcessStream, Func<TInput, TOutput>, Execute>(stackAllocationCount, ref span, in processStream, Selector);
     }
 }
