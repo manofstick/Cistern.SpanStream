@@ -4,24 +4,24 @@ using Cistern.Utils;
 namespace Cistern.SpanStream.Roots;
 
 
-public readonly struct SelectRoot<TInitial, TNext>
-    : IStreamNode<TNext>
+public readonly struct SelectRoot<TInput, TOutput>
+    : IStreamNode<TOutput>
 {
-    public Func<TInitial, TNext> Selector { get; }
+    public Func<TInput, TOutput> Selector { get; }
 
-    public SelectRoot(Func<TInitial, TNext> selector) =>
+    public SelectRoot(Func<TInput, TOutput> selector) =>
         Selector = selector;
 
-    int? IStreamNode<TNext>.TryGetSize(int sourceSize, out int upperBound)
+    int? IStreamNode<TOutput>.TryGetSize(int sourceSize, out int upperBound)
     {
         upperBound = sourceSize;
         return sourceSize;
     }
 
     struct Execute
-        : IExecuteIterator<TInitial, TNext, Func<TInitial, TNext>>
+        : IExecuteIterator<TInput, TOutput, Func<TInput, TOutput>>
     {
-        TResult IExecuteIterator<TInitial, TNext, Func<TInitial, TNext>>.Execute<TFinal, TResult, TProcessStream>(ref Builder<TFinal> builder, ref Span<TInitial> span, in TProcessStream stream, in Func<TInitial, TNext> selector)
+        TResult IExecuteIterator<TInput, TOutput, Func<TInput, TOutput>>.Execute<TFinal, TResult, TProcessStream>(ref Builder<TFinal> builder, ref Span<TInput> span, in TProcessStream stream, in Func<TInput, TOutput> selector)
         {
             var localCopy = stream;
             Iterator.Select(ref builder, span, ref localCopy, selector);
@@ -29,10 +29,10 @@ public readonly struct SelectRoot<TInitial, TNext>
         }
     }
 
-    TResult IStreamNode<TNext>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
+    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
-        var span = Unsafe.SpanCast<TInitialDuplicate, TInitial>(spanAsSourceDuplicate);
+        var span = Unsafe.SpanCast<TInitialDuplicate, TInput>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<TInitial, TNext, TFinal, TResult, TProcessStream, Func<TInitial, TNext>, Execute>(0, ref span, in processStream, Selector);
+        return StackAllocator.Execute<TInput, TOutput, TFinal, TResult, TProcessStream, Func<TInput, TOutput>, Execute>(0, ref span, in processStream, Selector);
     }
 }
