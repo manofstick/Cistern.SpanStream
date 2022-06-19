@@ -3,23 +3,23 @@ using Cistern.Utils;
 
 namespace Cistern.SpanStream.Roots;
 
-public readonly struct WhereRoot<TSource>
-    : IStreamNode<TSource>
+public readonly struct WhereRoot<TInitial>
+    : IStreamNode<TInitial>
 {
-    public readonly Func<TSource, bool> Predicate;
+    public readonly Func<TInitial, bool> Predicate;
 
-    public WhereRoot(Func<TSource, bool> predicate) => Predicate = predicate;
+    public WhereRoot(Func<TInitial, bool> predicate) => Predicate = predicate;
 
-    int? IStreamNode<TSource>.TryGetSize(int sourceSize, out int upperBound)
+    int? IStreamNode<TInitial>.TryGetSize(int sourceSize, out int upperBound)
     {
         upperBound = sourceSize;
         return null;
     }
 
     struct Execute
-        : IExecuteIterator<TSource, TSource, Func<TSource, bool>>
+        : IExecuteIterator<TInitial, TInitial, Func<TInitial, bool>>
     {
-        TResult IExecuteIterator<TSource, TSource, Func<TSource, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TSource> span, in TProcessStream stream, in Func<TSource, bool> predicate)
+        TResult IExecuteIterator<TInitial, TInitial, Func<TInitial, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TInitial> span, in TProcessStream stream, in Func<TInitial, bool> predicate)
         {
             var localCopy = stream;
             Iterator.Where(ref builder, span, ref localCopy, predicate);
@@ -27,10 +27,10 @@ public readonly struct WhereRoot<TSource>
         }
     }
 
-    TResult IStreamNode<TSource>.Execute<TSourceDuplicate, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
+    TResult IStreamNode<TInitial>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
-        var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
+        var span = Unsafe.SpanCast<TInitialDuplicate, TInitial>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<TSource, TSource, TCurrent, TResult, TProcessStream, Func<TSource, bool>, Execute>(0, ref span, in processStream, Predicate);
+        return StackAllocator.Execute<TInitial, TInitial, TFinal, TResult, TProcessStream, Func<TInitial, bool>, Execute>(0, ref span, in processStream, Predicate);
     }
 }

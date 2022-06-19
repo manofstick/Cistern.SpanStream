@@ -13,26 +13,26 @@ namespace Cistern.SpanStream
 
         // -----
 
-        public static TAccumulate Aggregate<TRoot, TCurrent, TNode, TAccumulate>(this in SpanHost<TRoot, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TCurrent, TAccumulate> func)
+        public static TAccumulate Aggregate<TInitial, TCurrent, TNode, TAccumulate>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TCurrent, TAccumulate> func)
             where TNode : struct, IStreamNode<TCurrent> =>
             source.Execute<TAccumulate, Aggregate<TCurrent, TAccumulate>>(new(func, seed));
 
-        //- [ ] `TResult Aggregate<TSource, TAccumulate, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector);`
-        //- [ ] `bool All<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `bool Any<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `bool Any<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `IEnumerable<TSource> Append<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource element);`
-        //- [ ] `IEnumerable<TSource> AsEnumerable<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `double Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int> selector);`
-        //- [ ] `double Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long> selector);`
-        //- [ ] `double? Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double?> selector);`
-        //- [ ] `float Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float> selector);`
-        //- [ ] `double? Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long?> selector);`
-        //- [ ] `float? Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float?> selector);`
-        //- [ ] `double Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double> selector);`
-        //- [ ] `double? Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int?> selector);`
-        //- [ ] `decimal Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal> selector);`
-        //- [ ] `decimal? Average<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal?> selector);`
+        //- [ ] `TResult Aggregate<TInitial, TAccumulate, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TInitial, TAccumulate> func, Func<TAccumulate, TResult> resultSelector);`
+        //- [ ] `bool All<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `IEnumerable<TInitial> Append<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial element);`
+        //- [ ] `IEnumerable<TInitial> AsEnumerable<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `double Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int> selector);`
+        //- [ ] `double Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long> selector);`
+        //- [ ] `double? Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double?> selector);`
+        //- [ ] `float Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float> selector);`
+        //- [ ] `double? Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long?> selector);`
+        //- [ ] `float? Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float?> selector);`
+        //- [ ] `double Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double> selector);`
+        //- [ ] `double? Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int?> selector);`
+        //- [ ] `decimal Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal> selector);`
+        //- [ ] `decimal? Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal?> selector);`
         //- [ ] `float? Average(this IEnumerable<float?> source);`
         //- [ ] `double? Average(this IEnumerable<long?> source);`
         //- [ ] `double? Average(this IEnumerable<int?> source);`
@@ -44,70 +44,70 @@ namespace Cistern.SpanStream
         //- [ ] `decimal Average(this IEnumerable<decimal> source);`
         //- [ ] `float Average(this IEnumerable<float> source);`
         //- [ ] `IEnumerable<TResult> Cast<TResult>(this IEnumerable source);`
-        //- [ ] `IEnumerable<TSource[]> Chunk<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, int size);`
-        //- [ ] `IEnumerable<TSource> Concat<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);`
-        //- [ ] `bool Contains<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource value, IEqualityComparer<TSource>? comparer);`
-        //- [ ] `bool Contains<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource value);`
-        //- [ ] `int Count<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `int Count<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `IEnumerable<TSource?> DefaultIfEmpty<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `IEnumerable<TSource> DefaultIfEmpty<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource defaultValue);`
-        //- [ ] `IEnumerable<TSource> Distinct<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `IEnumerable<TSource> Distinct<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, IEqualityComparer<TSource>? comparer);`
-        //- [ ] `IEnumerable<TSource> DistinctBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `IEnumerable<TSource> DistinctBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `TSource ElementAt<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Index index);`
-        //- [ ] `TSource ElementAt<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, int index);`
-        //- [ ] `TSource? ElementAtOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Index index);`
-        //- [ ] `TSource? ElementAtOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, int index);`
+        //- [ ] `IEnumerable<TInitial[]> Chunk<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, int size);`
+        //- [ ] `IEnumerable<TInitial> Concat<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second);`
+        //- [ ] `bool Contains<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial value, IEqualityComparer<TInitial>? comparer);`
+        //- [ ] `bool Contains<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial value);`
+        //- [ ] `int Count<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `int Count<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `IEnumerable<TInitial?> DefaultIfEmpty<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `IEnumerable<TInitial> DefaultIfEmpty<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial defaultValue);`
+        //- [ ] `IEnumerable<TInitial> Distinct<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `IEnumerable<TInitial> Distinct<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, IEqualityComparer<TInitial>? comparer);`
+        //- [ ] `IEnumerable<TInitial> DistinctBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IEnumerable<TInitial> DistinctBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `TInitial ElementAt<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Index index);`
+        //- [ ] `TInitial ElementAt<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, int index);`
+        //- [ ] `TInitial? ElementAtOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Index index);`
+        //- [ ] `TInitial? ElementAtOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, int index);`
         //- [ ] `IEnumerable<TResult> Empty<TResult>();`
-        //- [ ] `IEnumerable<TSource> Except<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);`
-        //- [ ] `IEnumerable<TSource> Except<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer);`
-        //- [ ] `IEnumerable<TSource> ExceptBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TKey> second, Func<TSource, TKey> keySelector);`
-        //- [ ] `IEnumerable<TSource> ExceptBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `TSource First<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `TSource First<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `TSource? FirstOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `TSource FirstOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource defaultValue);`
-        //- [ ] `TSource? FirstOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `TSource FirstOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate, TSource defaultValue);`
-        //- [ ] `IEnumerable<TResult> GroupBy<TSource, TKey, TElement, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `IEnumerable<TResult> GroupBy<TSource, TKey, TElement, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector);`
-        //- [ ] `IEnumerable<TResult> GroupBy<TSource, TKey, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `IEnumerable<TResult> GroupBy<TSource, TKey, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector);`
-        //- [ ] `IEnumerable<IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `IEnumerable<IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector);`
-        //- [ ] `IEnumerable<IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `IEnumerable<IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `IEnumerable<TInitial> Except<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second);`
+        //- [ ] `IEnumerable<TInitial> Except<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second, IEqualityComparer<TInitial>? comparer);`
+        //- [ ] `IEnumerable<TInitial> ExceptBy<TInitial, TKey>(this IEnumerable<TInitial> first, IEnumerable<TKey> second, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IEnumerable<TInitial> ExceptBy<TInitial, TKey>(this IEnumerable<TInitial> first, IEnumerable<TKey> second, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `TInitial First<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `TInitial First<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `TInitial? FirstOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `TInitial FirstOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial defaultValue);`
+        //- [ ] `TInitial? FirstOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `TInitial FirstOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate, TInitial defaultValue);`
+        //- [ ] `IEnumerable<TResult> GroupBy<TInitial, TKey, TElement, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `IEnumerable<TResult> GroupBy<TInitial, TKey, TElement, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector);`
+        //- [ ] `IEnumerable<TResult> GroupBy<TInitial, TKey, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TKey, IEnumerable<TInitial>, TResult> resultSelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `IEnumerable<TResult> GroupBy<TInitial, TKey, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TKey, IEnumerable<TInitial>, TResult> resultSelector);`
+        //- [ ] `IEnumerable<IGrouping<TKey, TInitial>> GroupBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IEnumerable<IGrouping<TKey, TElement>> GroupBy<TInitial, TKey, TElement>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector);`
+        //- [ ] `IEnumerable<IGrouping<TKey, TInitial>> GroupBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `IEnumerable<IGrouping<TKey, TElement>> GroupBy<TInitial, TKey, TElement>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector, IEqualityComparer<TKey>? comparer);`
         //- [ ] `IEnumerable<TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this IEnumerable<TOuter> outer, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey>? comparer);`
         //- [ ] `IEnumerable<TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this IEnumerable<TOuter> outer, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector);`
-        //- [ ] `IEnumerable<TSource> Intersect<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer);`
-        //- [ ] `IEnumerable<TSource> Intersect<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);`
-        //- [ ] `IEnumerable<TSource> IntersectBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TKey> second, Func<TSource, TKey> keySelector);`
-        //- [ ] `IEnumerable<TSource> IntersectBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `IEnumerable<TInitial> Intersect<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second, IEqualityComparer<TInitial>? comparer);`
+        //- [ ] `IEnumerable<TInitial> Intersect<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second);`
+        //- [ ] `IEnumerable<TInitial> IntersectBy<TInitial, TKey>(this IEnumerable<TInitial> first, IEnumerable<TKey> second, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IEnumerable<TInitial> IntersectBy<TInitial, TKey>(this IEnumerable<TInitial> first, IEnumerable<TKey> second, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
         //- [ ] `IEnumerable<TResult> Join<TOuter, TInner, TKey, TResult>(this IEnumerable<TOuter> outer, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector);`
         //- [ ] `IEnumerable<TResult> Join<TOuter, TInner, TKey, TResult>(this IEnumerable<TOuter> outer, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `TSource Last<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `TSource Last<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `TSource? LastOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `TSource LastOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource defaultValue);`
-        //- [ ] `TSource? LastOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `TSource LastOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate, TSource defaultValue);`
-        //- [ ] `long LongCount<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `long LongCount<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `long Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long> selector);`
-        //- [ ] `decimal Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal> selector);`
-        //- [ ] `double Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double> selector);`
-        //- [ ] `int Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int> selector);`
-        //- [ ] `decimal? Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal?> selector);`
-        //- [ ] `TSource? Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, IComparer<TSource>? comparer);`
-        //- [ ] `int? Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int?> selector);`
-        //- [ ] `long? Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long?> selector);`
-        //- [ ] `float? Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float?> selector);`
-        //- [ ] `TResult? Max<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TResult> selector);`
-        //- [ ] `double? Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double?> selector);`
-        //- [ ] `TSource? Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `float Max<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float> selector);`
+        //- [ ] `TInitial Last<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `TInitial Last<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `TInitial? LastOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `TInitial LastOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial defaultValue);`
+        //- [ ] `TInitial? LastOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `TInitial LastOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate, TInitial defaultValue);`
+        //- [ ] `long LongCount<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `long LongCount<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `long Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long> selector);`
+        //- [ ] `decimal Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal> selector);`
+        //- [ ] `double Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double> selector);`
+        //- [ ] `int Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int> selector);`
+        //- [ ] `decimal? Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal?> selector);`
+        //- [ ] `TInitial? Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, IComparer<TInitial>? comparer);`
+        //- [ ] `int? Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int?> selector);`
+        //- [ ] `long? Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long?> selector);`
+        //- [ ] `float? Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float?> selector);`
+        //- [ ] `TResult? Max<TInitial, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TResult> selector);`
+        //- [ ] `double? Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double?> selector);`
+        //- [ ] `TInitial? Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `float Max<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float> selector);`
         //- [ ] `float Max(this IEnumerable<float> source);`
         //- [ ] `float? Max(this IEnumerable<float?> source);`
         //- [ ] `long? Max(this IEnumerable<long?> source);`
@@ -118,22 +118,22 @@ namespace Cistern.SpanStream
         //- [ ] `int Max(this IEnumerable<int> source);`
         //- [ ] `double Max(this IEnumerable<double> source);`
         //- [ ] `decimal Max(this IEnumerable<decimal> source);`
-        //- [ ] `TSource? MaxBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `TSource? MaxBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
+        //- [ ] `TInitial? MaxBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `TInitial? MaxBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
         //- [ ] `decimal Min(this IEnumerable<decimal> source);`
-        //- [ ] `TResult? Min<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TResult> selector);`
-        //- [ ] `float Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float> selector);`
-        //- [ ] `float? Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float?> selector);`
-        //- [ ] `int? Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int?> selector);`
-        //- [ ] `double? Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double?> selector);`
-        //- [ ] `decimal? Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal?> selector);`
-        //- [ ] `long Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long> selector);`
-        //- [ ] `int Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int> selector);`
-        //- [ ] `decimal Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal> selector);`
-        //- [ ] `TSource? Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, IComparer<TSource>? comparer);`
-        //- [ ] `TSource? Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `long? Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long?> selector);`
-        //- [ ] `double Min<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double> selector);`
+        //- [ ] `TResult? Min<TInitial, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TResult> selector);`
+        //- [ ] `float Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float> selector);`
+        //- [ ] `float? Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float?> selector);`
+        //- [ ] `int? Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int?> selector);`
+        //- [ ] `double? Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double?> selector);`
+        //- [ ] `decimal? Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal?> selector);`
+        //- [ ] `long Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long> selector);`
+        //- [ ] `int Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int> selector);`
+        //- [ ] `decimal Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal> selector);`
+        //- [ ] `TInitial? Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, IComparer<TInitial>? comparer);`
+        //- [ ] `TInitial? Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `long? Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long?> selector);`
+        //- [ ] `double Min<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double> selector);`
         //- [ ] `float Min(this IEnumerable<float> source);`
         //- [ ] `float? Min(this IEnumerable<float?> source);`
         //- [ ] `long? Min(this IEnumerable<long?> source);`
@@ -143,59 +143,59 @@ namespace Cistern.SpanStream
         //- [ ] `double Min(this IEnumerable<double> source);`
         //- [ ] `long Min(this IEnumerable<long> source);`
         //- [ ] `int Min(this IEnumerable<int> source);`
-        //- [ ] `TSource? MinBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
-        //- [ ] `TSource? MinBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector);`
+        //- [ ] `TInitial? MinBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
+        //- [ ] `TInitial? MinBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
         //- [ ] `IEnumerable<TResult> OfType<TResult>(this IEnumerable source);`
-        //- [ ] `IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
-        //- [ ] `IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `IOrderedEnumerable<TSource> OrderByDescending<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `IOrderedEnumerable<TSource> OrderByDescending<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
-        //- [ ] `IEnumerable<TSource> Prepend<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource element);`
+        //- [ ] `IOrderedEnumerable<TInitial> OrderBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
+        //- [ ] `IOrderedEnumerable<TInitial> OrderBy<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IOrderedEnumerable<TInitial> OrderByDescending<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IOrderedEnumerable<TInitial> OrderByDescending<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
+        //- [ ] `IEnumerable<TInitial> Prepend<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial element);`
         //- [ ] `IEnumerable<int> Range(int start, int count);`
         //- [ ] `IEnumerable<TResult> Repeat<TResult>(TResult element, int count);`
-        //- [ ] `IEnumerable<TSource> Reverse<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
+        //- [ ] `IEnumerable<TInitial> Reverse<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
 
-        public static SpanHost<TSource, TCurrent, SelectRoot<TSource, TCurrent>> Select<TSource, TCurrent>(this in ReadOnlySpan<TSource> span, Func<TSource, TCurrent> selector) =>
+        public static SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> Select<TInitial, TCurrent>(this in ReadOnlySpan<TInitial> span, Func<TInitial, TCurrent> selector) =>
             new(span, new(selector));
-        public static SpanHost<TSource, TCurrent, SelectRoot<TSource, TCurrent>> Select<TSource, TCurrent>(this in SpanHost<TSource, TSource, Root<TSource>> source, Func<TSource, TCurrent> selector) =>
+        public static SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> Select<TInitial, TCurrent>(this in SpanHost<TInitial, TInitial, Root<TInitial>> source, Func<TInitial, TCurrent> selector) =>
             new(source.Span, new(selector));
         public static SpanHost<TCurrent, TNext, WhereSelectRoot<TCurrent, TNext>> Select<TCurrent, TNext>(this in SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>> source, Func<TCurrent, TNext> selector) =>
             new(source.Span, new(source.Node.Predicate, selector));
-        public static SpanHost<TRoot, TNext, WhereSelect<TCurrent, TNext, TNode>> Select<TRoot, TCurrent, TNext, TNode>(this in SpanHost<TRoot, TCurrent, Where<TCurrent, TNode>> source, Func<TCurrent, TNext> selector)
+        public static SpanHost<TInitial, TNext, WhereSelect<TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TCurrent, Where<TCurrent, TNode>> source, Func<TCurrent, TNext> selector)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new(in source.Node.Node, source.Node.Predicate, selector));
-        public static SpanHost<TRoot, TNext, Select<TCurrent, TNext, TNode>> Select<TRoot, TCurrent, TNext, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
+        public static SpanHost<TInitial, TNext, Select<TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new(in source.Node, selector));
 
-        //- [ ] `IEnumerable<TResult> Select<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, TResult> selector);`
+        //- [ ] `IEnumerable<TResult> Select<TInitial, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, TResult> selector);`
 
-        //- [ ] `IEnumerable<TResult> SelectMany<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, IEnumerable<TResult>> selector);`
-        //- [ ] `IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector);`
-        //- [ ] `IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector);`
-        //- [ ] `IEnumerable<TResult> SelectMany<TSource, TResult>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, IEnumerable<TResult>> selector);`
-        //- [ ] `bool SequenceEqual<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);`
-        //- [ ] `bool SequenceEqual<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer);`
-        //- [ ] `TSource Single<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `TSource Single<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `TSource SingleOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate, TSource defaultValue);`
-        //- [ ] `TSource SingleOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, TSource defaultValue);`
-        //- [ ] `TSource? SingleOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `TSource? SingleOrDefault<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `IEnumerable<TSource> Skip<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, int count);`
-        //- [ ] `IEnumerable<TSource> SkipLast<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, int count);`
-        //- [ ] `IEnumerable<TSource> SkipWhile<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `IEnumerable<TSource> SkipWhile<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, bool> predicate);`
-        //- [ ] `int Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int> selector);`
-        //- [ ] `long Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long> selector);`
-        //- [ ] `decimal? Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal?> selector);`
-        //- [ ] `long? Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, long?> selector);`
-        //- [ ] `int? Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int?> selector);`
-        //- [ ] `double Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double> selector);`
-        //- [ ] `float? Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float?> selector);`
-        //- [ ] `float Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, float> selector);`
-        //- [ ] `double? Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, double?> selector);`
-        //- [ ] `decimal Sum<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, decimal> selector);`
+        //- [ ] `IEnumerable<TResult> SelectMany<TInitial, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, IEnumerable<TResult>> selector);`
+        //- [ ] `IEnumerable<TResult> SelectMany<TInitial, TCollection, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, IEnumerable<TCollection>> collectionSelector, Func<TInitial, TCollection, TResult> resultSelector);`
+        //- [ ] `IEnumerable<TResult> SelectMany<TInitial, TCollection, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, IEnumerable<TCollection>> collectionSelector, Func<TInitial, TCollection, TResult> resultSelector);`
+        //- [ ] `IEnumerable<TResult> SelectMany<TInitial, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, IEnumerable<TResult>> selector);`
+        //- [ ] `bool SequenceEqual<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second);`
+        //- [ ] `bool SequenceEqual<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second, IEqualityComparer<TInitial>? comparer);`
+        //- [ ] `TInitial Single<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `TInitial Single<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `TInitial SingleOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate, TInitial defaultValue);`
+        //- [ ] `TInitial SingleOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial defaultValue);`
+        //- [ ] `TInitial? SingleOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `TInitial? SingleOrDefault<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `IEnumerable<TInitial> Skip<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, int count);`
+        //- [ ] `IEnumerable<TInitial> SkipLast<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, int count);`
+        //- [ ] `IEnumerable<TInitial> SkipWhile<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `IEnumerable<TInitial> SkipWhile<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, bool> predicate);`
+        //- [ ] `int Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int> selector);`
+        //- [ ] `long Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long> selector);`
+        //- [ ] `decimal? Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal?> selector);`
+        //- [ ] `long? Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long?> selector);`
+        //- [ ] `int? Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int?> selector);`
+        //- [ ] `double Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double> selector);`
+        //- [ ] `float? Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float?> selector);`
+        //- [ ] `float Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, float> selector);`
+        //- [ ] `double? Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, double?> selector);`
+        //- [ ] `decimal Sum<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, decimal> selector);`
         //- [ ] `long? Sum(this IEnumerable<long?> source);`
         //- [ ] `float? Sum(this IEnumerable<float?> source);`
         //- [ ] `int? Sum(this IEnumerable<int?> source);`
@@ -206,17 +206,17 @@ namespace Cistern.SpanStream
         //- [ ] `double Sum(this IEnumerable<double> source);`
         //- [ ] `decimal Sum(this IEnumerable<decimal> source);`
         //- [ ] `float Sum(this IEnumerable<float> source);`
-        //- [ ] `IEnumerable<TSource> Take<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Range range);`
-        //- [ ] `IEnumerable<TSource> Take<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, int count);`
-        //- [ ] `IEnumerable<TSource> TakeLast<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, int count);`
-        //- [ ] `IEnumerable<TSource> TakeWhile<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, bool> predicate);`
-        //- [ ] `IEnumerable<TSource> TakeWhile<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, bool> predicate);`
-        //- [ ] `IOrderedEnumerable<TSource> ThenBy<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `IOrderedEnumerable<TSource> ThenBy<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
-        //- [ ] `IOrderedEnumerable<TSource> ThenByDescending<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `IOrderedEnumerable<TSource> ThenByDescending<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
+        //- [ ] `IEnumerable<TInitial> Take<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Range range);`
+        //- [ ] `IEnumerable<TInitial> Take<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, int count);`
+        //- [ ] `IEnumerable<TInitial> TakeLast<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, int count);`
+        //- [ ] `IEnumerable<TInitial> TakeWhile<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
+        //- [ ] `IEnumerable<TInitial> TakeWhile<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, bool> predicate);`
+        //- [ ] `IOrderedEnumerable<TInitial> ThenBy<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IOrderedEnumerable<TInitial> ThenBy<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
+        //- [ ] `IOrderedEnumerable<TInitial> ThenByDescending<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IOrderedEnumerable<TInitial> ThenByDescending<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
 
-        public static TCurrent[] ToArray<TRoot, TCurrent, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source)
+        public static TCurrent[] ToArray<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source)
             where TNode : struct, IStreamNode<TCurrent>
         {
             var maybeSize = source.TryGetSize(out var upperBound);
@@ -226,40 +226,40 @@ namespace Cistern.SpanStream
             return source.Execute<TCurrent[], ToArray<TCurrent>>(new());
         }
 
-        public static TCurrent[] ToArray<TRoot, TCurrent>(this in SpanHost<TRoot, TCurrent, SelectRoot<TRoot, TCurrent>> source)
+        public static TCurrent[] ToArray<TInitial, TCurrent>(this in SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source)
             => Iterator.SelectToArray(source.Span, source.Node.Selector);
 
-        //- [ ] `Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector) where TKey : notnull;`
-        //- [ ] `Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
-        //- [ ] `Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) where TKey : notnull;`
-        //- [ ] `Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
-        //- [ ] `HashSet<TSource> ToHashSet<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, IEqualityComparer<TSource>? comparer);`
-        //- [ ] `HashSet<TSource> ToHashSet<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `List<TSource> ToList<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source);`
-        //- [ ] `ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector);`
-        //- [ ] `ILookup<TKey, TSource> ToLookup<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector);`
-        //- [ ] `ILookup<TKey, TSource> ToLookup<TSource, TKey>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
-        //- [ ] `bool TryGetNonEnumeratedCount<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, out int count);`
-        //- [ ] `IEnumerable<TSource> Union<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);`
-        //- [ ] `IEnumerable<TSource> Union<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer);`
-        //- [ ] `IEnumerable<TSource> UnionBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TSource> second, Func<TSource, TKey> keySelector);`
-        //- [ ] `IEnumerable<TSource> UnionBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `Dictionary<TKey, TInitial> ToDictionary<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector) where TKey : notnull;`
+        //- [ ] `Dictionary<TKey, TInitial> ToDictionary<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
+        //- [ ] `Dictionary<TKey, TElement> ToDictionary<TInitial, TKey, TElement>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector) where TKey : notnull;`
+        //- [ ] `Dictionary<TKey, TElement> ToDictionary<TInitial, TKey, TElement>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
+        //- [ ] `HashSet<TInitial> ToHashSet<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, IEqualityComparer<TInitial>? comparer);`
+        //- [ ] `HashSet<TInitial> ToHashSet<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `List<TInitial> ToList<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
+        //- [ ] `ILookup<TKey, TElement> ToLookup<TInitial, TKey, TElement>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `ILookup<TKey, TElement> ToLookup<TInitial, TKey, TElement>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector);`
+        //- [ ] `ILookup<TKey, TInitial> ToLookup<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
+        //- [ ] `ILookup<TKey, TInitial> ToLookup<TInitial, TKey>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
+        //- [ ] `bool TryGetNonEnumeratedCount<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, out int count);`
+        //- [ ] `IEnumerable<TInitial> Union<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second);`
+        //- [ ] `IEnumerable<TInitial> Union<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second, IEqualityComparer<TInitial>? comparer);`
+        //- [ ] `IEnumerable<TInitial> UnionBy<TInitial, TKey>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second, Func<TInitial, TKey> keySelector);`
+        //- [ ] `IEnumerable<TInitial> UnionBy<TInitial, TKey>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
 
-        public static SpanHost<TSource, TSource, WhereRoot<TSource>> Where<TSource>(this in ReadOnlySpan<TSource> span, Func<TSource, bool> predicate) =>
+        public static SpanHost<TInitial, TInitial, WhereRoot<TInitial>> Where<TInitial>(this in ReadOnlySpan<TInitial> span, Func<TInitial, bool> predicate) =>
             new(span, new(predicate));
-        public static SpanHost<TSource, TSource, WhereRoot<TSource>> Where<TSource>(this in SpanHost<TSource, TSource, Root<TSource>> source, Func<TSource, bool> predicate) =>
+        public static SpanHost<TInitial, TInitial, WhereRoot<TInitial>> Where<TInitial>(this in SpanHost<TInitial, TInitial, Root<TInitial>> source, Func<TInitial, bool> predicate) =>
             new(source.Span, new(predicate));
-        public static SpanHost<TSource, TCurrent, SelectWhereRoot<TSource, TCurrent>> Where<TSource, TCurrent>(this in SpanHost<TSource, TCurrent, SelectRoot<TSource, TCurrent>> source, Func<TCurrent, bool> predicate) =>
+        public static SpanHost<TInitial, TCurrent, SelectWhereRoot<TInitial, TCurrent>> Where<TInitial, TCurrent>(this in SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source, Func<TCurrent, bool> predicate) =>
             new(source.Span, new(source.Node.Selector, predicate));
-        public static SpanHost<TRoot, TNext, SelectWhere<TCurrent, TNext, TNode>> Where<TRoot, TCurrent, TNext, TNode>(this in SpanHost<TRoot, TNext, Select<TCurrent, TNext, TNode>> source, Func<TNext, bool> predicate)
+        public static SpanHost<TInitial, TNext, SelectWhere<TCurrent, TNext, TNode>> Where<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TNext, Select<TCurrent, TNext, TNode>> source, Func<TNext, bool> predicate)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new(in source.Node.Node, source.Node.Selector, predicate));
-        public static SpanHost<TRoot, TCurrent, Where<TCurrent, TNode>> Where<TRoot, TCurrent, TNode>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
+        public static SpanHost<TInitial, TCurrent, Where<TCurrent, TNode>> Where<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
             where TNode : struct, IStreamNode<TCurrent> =>
             new(source.Span, new(in source.Node, predicate));
 
-        //- [ ] `IEnumerable<TSource> Where<TSource>(this in SpanHost<TRoot, TCurrent, TNode> source, Func<TSource, int, bool> predicate);`
+        //- [ ] `IEnumerable<TInitial> Where<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, bool> predicate);`
         //- [ ] `IEnumerable<(TFirst First, TSecond Second, TThird Third)> Zip<TFirst, TSecond, TThird>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third);`
         //- [ ] `IEnumerable<(TFirst First, TSecond Second)> Zip<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second);`
         //- [ ] `IEnumerable<TResult> Zip<TFirst, TSecond, TResult>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector);`

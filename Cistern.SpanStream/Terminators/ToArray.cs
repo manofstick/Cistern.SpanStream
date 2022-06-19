@@ -3,40 +3,40 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Terminators;
 
-public struct ToArray<TSource>
-    : IProcessStream<TSource, TSource, TSource[]>
+public struct ToArray<T>
+    : IProcessStream<T, T, T[]>
 {
     public ToArray() { }
 
-    TSource[] IProcessStream<TSource, TSource, TSource[]>.GetResult(ref Builder<TSource> builder) => builder.ToArray();
+    T[] IProcessStream<T, T, T[]>.GetResult(ref Builder<T> builder) => builder.ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TSource, TSource>.ProcessNext(ref Builder<TSource> builder, in TSource input)
+    bool IProcessStream<T, T>.ProcessNext(ref Builder<T> builder, in T input)
     {
         builder.Add(input);
         return true;
     }
 }
 
-public struct ToArrayKnownSize<TSource>
-    : IProcessStream<TSource, TSource, TSource[]>
+public struct ToArrayKnownSize<T>
+    : IProcessStream<T, T, T[]>
 {
-    private TSource[] _array;
+    private T[] _array;
     private int _index;
 
-    public ToArrayKnownSize(TSource[] arrayToFill) => (_array, _index) = (arrayToFill, 0);
+    public ToArrayKnownSize(T[] arrayToFill) => (_array, _index) = (arrayToFill, 0);
 
-    TSource[] IProcessStream<TSource, TSource, TSource[]>.GetResult(ref Builder<TSource> builder)
+    T[] IProcessStream<T, T, T[]>.GetResult(ref Builder<T> builder)
     {
         if (_array.Length != _index)
-            ToArrayKnownSize<TSource>.DidntFillArray();
+            ToArrayKnownSize<T>.DidntFillArray();
         return _array;
     }
 
     private static void DidntFillArray() => throw new Exception("_array.Length != _index");
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TSource, TSource>.ProcessNext(ref Builder<TSource> builder, in TSource input)
+    bool IProcessStream<T, T>.ProcessNext(ref Builder<T> builder, in T input)
     {
         _array[_index++] = input;
         return true;

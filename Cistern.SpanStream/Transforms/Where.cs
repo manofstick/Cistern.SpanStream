@@ -3,39 +3,39 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
-public readonly struct Where<T, NodeT>
-    : IStreamNode<T>
-    where NodeT : struct, IStreamNode<T>
+public readonly struct Where<TCurrent, TPriorNode>
+    : IStreamNode<TCurrent>
+    where TPriorNode : struct, IStreamNode<TCurrent>
 {
-    public readonly NodeT Node;
-    public Func<T, bool> Predicate { get; }
+    public readonly TPriorNode Node;
+    public Func<TCurrent, bool> Predicate { get; }
 
-    public Where(in NodeT nodeT, Func<T, bool> predicate) =>
+    public Where(in TPriorNode nodeT, Func<TCurrent, bool> predicate) =>
         (Node, Predicate) = (nodeT, predicate);
 
-    int? IStreamNode<T>.TryGetSize(int sourceSize, out int upperBound)
+    int? IStreamNode<TCurrent>.TryGetSize(int sourceSize, out int upperBound)
     {
         Node.TryGetSize(sourceSize, out upperBound);
         return 0;
     }
 
-    TResult IStreamNode<T>.Execute<TRoot, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
-        Node.Execute<TRoot, TCurrent, TResult, WhereStream<T, TCurrent, TResult, TProcessStream>>(in span, new(in processStream, Predicate));
+    TResult IStreamNode<TCurrent>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, in TProcessStream processStream) =>
+        Node.Execute<TInitialDuplicate, TFinal, TResult, WhereStream<TCurrent, TFinal, TResult, TProcessStream>>(in span, new(in processStream, Predicate));
 }
 
-struct WhereStream<T, TCurrent, TResult, TProcessStream>
-    : IProcessStream<T, TCurrent, TResult>
-    where TProcessStream : struct, IProcessStream<T, TCurrent, TResult>
+struct WhereStream<TCurrent, TFinal, TResult, TProcessStream>
+    : IProcessStream<TCurrent, TFinal, TResult>
+    where TProcessStream : struct, IProcessStream<TCurrent, TFinal, TResult>
 {
     /* can't be readonly */ TProcessStream _next;
-    readonly Func<T, bool> _predicate;
+    readonly Func<TCurrent, bool> _predicate;
 
-    public WhereStream(in TProcessStream nextProcessStream, Func<T, bool> predicate) =>
+    public WhereStream(in TProcessStream nextProcessStream, Func<TCurrent, bool> predicate) =>
         (_next, _predicate) = (nextProcessStream, predicate);
 
-    TResult IProcessStream<T, TCurrent, TResult>.GetResult(ref Builder<TCurrent> builder) => _next.GetResult(ref builder);
+    TResult IProcessStream<TCurrent, TFinal, TResult>.GetResult(ref Builder<TFinal> builder) => _next.GetResult(ref builder);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<T, TCurrent>.ProcessNext(ref Builder<TCurrent> builder, in T input) =>
+    bool IProcessStream<TCurrent, TFinal>.ProcessNext(ref Builder<TFinal> builder, in TCurrent input) =>
         !_predicate(input) || _next.ProcessNext(ref builder, input);
 }

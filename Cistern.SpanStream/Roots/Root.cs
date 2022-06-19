@@ -3,10 +3,10 @@ using Cistern.Utils;
 
 namespace Cistern.SpanStream.Roots;
 
-public readonly struct Root<TSource>
-    : IStreamNode<TSource>
+public readonly struct Root<TInitial>
+    : IStreamNode<TInitial>
 {
-    int? IStreamNode<TSource>.TryGetSize(int sourceSize, out int upperBound)
+    int? IStreamNode<TInitial>.TryGetSize(int sourceSize, out int upperBound)
     {
         upperBound = sourceSize;
         return sourceSize;
@@ -15,9 +15,9 @@ public readonly struct Root<TSource>
     struct Null { }
 
     struct Execute
-        : IExecuteIterator<TSource, TSource, Null>
+        : IExecuteIterator<TInitial, TInitial, Null>
     {
-        TResult IExecuteIterator<TSource, TSource, Null>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TSource> span, in TProcessStream stream, in Null selector)
+        TResult IExecuteIterator<TInitial, TInitial, Null>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TInitial> span, in TProcessStream stream, in Null selector)
         {
             var localCopy = stream;
             Iterator.Vanilla(ref builder, span, ref localCopy);
@@ -25,10 +25,10 @@ public readonly struct Root<TSource>
         }
     }
 
-    TResult IStreamNode<TSource>.Execute<TSourceDuplicate, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
+    TResult IStreamNode<TInitial>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
-        var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
+        var span = Unsafe.SpanCast<TInitialDuplicate, TInitial>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<TSource, TSource, TCurrent, TResult, TProcessStream, Null, Execute>(0, ref span, in processStream, default);
+        return StackAllocator.Execute<TInitial, TInitial, TFinal, TResult, TProcessStream, Null, Execute>(0, ref span, in processStream, default);
     }
 }

@@ -3,42 +3,42 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
-public readonly struct SelectWhere<T, U, NodeT>
-    : IStreamNode<U>
-    where NodeT : struct, IStreamNode<T>
+public readonly struct SelectWhere<TInput, TOutput, TPriorNode>
+    : IStreamNode<TOutput>
+    where TPriorNode : struct, IStreamNode<TInput>
 {
-    public readonly NodeT Node;
-    private Func<T, U> Selector { get; }
-    private Func<U, bool> Predicate { get; }
+    public readonly TPriorNode Node;
+    private Func<TInput, TOutput> Selector { get; }
+    private Func<TOutput, bool> Predicate { get; }
 
-    public SelectWhere(in NodeT nodeT, Func<T, U> selector, Func<U, bool> predicate) =>
+    public SelectWhere(in TPriorNode nodeT, Func<TInput, TOutput> selector, Func<TOutput, bool> predicate) =>
         (Node, Selector, Predicate) = (nodeT, selector, predicate);
 
-    int? IStreamNode<U>.TryGetSize(int sourceSize, out int upperBound)
+    int? IStreamNode<TOutput>.TryGetSize(int sourceSize, out int upperBound)
     {
         Node.TryGetSize(sourceSize, out upperBound);
         return 0;
     }
 
-    TResult IStreamNode<U>.Execute<TRoot, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TRoot> span, in TProcessStream processStream) =>
-        Node.Execute<TRoot, TCurrent, TResult, SelectWhereStream<T, U, TCurrent, TResult, TProcessStream>>(in span, new(in processStream, Selector, Predicate));
+    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, in TProcessStream processStream) =>
+        Node.Execute<TInitialDuplicate, TFinal, TResult, SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, new(in processStream, Selector, Predicate));
 }
 
-struct SelectWhereStream<T, U, TCurrent, TResult, TProcessStream>
-    : IProcessStream<T, TCurrent, TResult>
-    where TProcessStream : struct, IProcessStream<U, TCurrent, TResult>
+struct SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>
+    : IProcessStream<TInput, TFinal, TResult>
+    where TProcessStream : struct, IProcessStream<TOutput, TFinal, TResult>
 {
     /* can't be readonly */ TProcessStream _next;
-    readonly Func<T, U> _selector;
-    readonly Func<U, bool> _predicate;
+    readonly Func<TInput, TOutput> _selector;
+    readonly Func<TOutput, bool> _predicate;
 
-    public SelectWhereStream(in TProcessStream nextProcessStream, Func<T, U> selector, Func<U, bool> predicate) =>
+    public SelectWhereStream(in TProcessStream nextProcessStream, Func<TInput, TOutput> selector, Func<TOutput, bool> predicate) =>
         (_next, _selector, _predicate) = (nextProcessStream, selector, predicate);
 
-    TResult IProcessStream<T, TCurrent, TResult>.GetResult(ref Builder<TCurrent> builder) => _next.GetResult(ref builder);
+    TResult IProcessStream<TInput, TFinal, TResult>.GetResult(ref Builder<TFinal> builder) => _next.GetResult(ref builder);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<T, TCurrent>.ProcessNext(ref Builder<TCurrent> builder, in T input)
+    bool IProcessStream<TInput, TFinal>.ProcessNext(ref Builder<TFinal> builder, in TInput input)
     {
         var u = _selector(input);
         if (_predicate(u))

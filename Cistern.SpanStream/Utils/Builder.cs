@@ -78,9 +78,9 @@ internal static class StackAllocator
             Allocate<T, Chunk>(requiredSize, currentSize);
     }
 
-    public static TResult Execute<TSource, TNext, TCurrent, TResult, TProcessStream, TState, TExecution>(int requiredSize, ref Span<TSource> span, in TProcessStream stream, in TState state)
+    public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TState, TExecution>(int requiredSize, ref Span<TInitial> span, in TProcessStream stream, in TState state)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
-        where TExecution : struct, IExecuteIterator<TSource, TNext, TState>
+        where TExecution : struct, IExecuteIterator<TInitial, TNext, TState>
     {
         Builder<TCurrent> builder = default;
 

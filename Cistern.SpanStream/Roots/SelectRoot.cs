@@ -4,12 +4,12 @@ using Cistern.Utils;
 namespace Cistern.SpanStream.Roots;
 
 
-public readonly struct SelectRoot<TSource, TNext>
+public readonly struct SelectRoot<TInitial, TNext>
     : IStreamNode<TNext>
 {
-    public Func<TSource, TNext> Selector { get; }
+    public Func<TInitial, TNext> Selector { get; }
 
-    public SelectRoot(Func<TSource, TNext> selector) =>
+    public SelectRoot(Func<TInitial, TNext> selector) =>
         Selector = selector;
 
     int? IStreamNode<TNext>.TryGetSize(int sourceSize, out int upperBound)
@@ -19,9 +19,9 @@ public readonly struct SelectRoot<TSource, TNext>
     }
 
     struct Execute
-        : IExecuteIterator<TSource, TNext, Func<TSource, TNext>>
+        : IExecuteIterator<TInitial, TNext, Func<TInitial, TNext>>
     {
-        TResult IExecuteIterator<TSource, TNext, Func<TSource, TNext>>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TSource> span, in TProcessStream stream, in Func<TSource, TNext> selector)
+        TResult IExecuteIterator<TInitial, TNext, Func<TInitial, TNext>>.Execute<TFinal, TResult, TProcessStream>(ref Builder<TFinal> builder, ref Span<TInitial> span, in TProcessStream stream, in Func<TInitial, TNext> selector)
         {
             var localCopy = stream;
             Iterator.Select(ref builder, span, ref localCopy, selector);
@@ -29,10 +29,10 @@ public readonly struct SelectRoot<TSource, TNext>
         }
     }
 
-    TResult IStreamNode<TNext>.Execute<TSourceDuplicate, TCurrent, TResult, TProcessStream>(in ReadOnlySpan<TSourceDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
+    TResult IStreamNode<TNext>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, in TProcessStream processStream)
     {
-        var span = Unsafe.SpanCast<TSourceDuplicate, TSource>(spanAsSourceDuplicate);
+        var span = Unsafe.SpanCast<TInitialDuplicate, TInitial>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<TSource, TNext, TCurrent, TResult, TProcessStream, Func<TSource, TNext>, Execute>(0, ref span, in processStream, Selector);
+        return StackAllocator.Execute<TInitial, TNext, TFinal, TResult, TProcessStream, Func<TInitial, TNext>, Execute>(0, ref span, in processStream, Selector);
     }
 }
