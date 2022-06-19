@@ -19,11 +19,11 @@ public readonly struct WhereRoot<T>
     struct Execute
         : IExecuteIterator<T, T, Func<T, bool>>
     {
-        TResult IExecuteIterator<T, T, Func<T, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<T> span, in TProcessStream stream, in Func<T, bool> predicate)
+        TResult IExecuteIterator<T, T, Func<T, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<T> span, in TProcessStream stream, in Func<T, bool> predicate)
         {
             var localCopy = stream;
-            Iterator.Where(ref builder, span, ref localCopy, predicate);
-            return localCopy.GetResult(ref builder);
+            Iterator.Where(ref state, span, ref localCopy, predicate);
+            return localCopy.GetResult(ref state);
         }
     }
 

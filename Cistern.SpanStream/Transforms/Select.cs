@@ -29,9 +29,9 @@ struct SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>
     public SelectStream(in TProcessStream nextProcessStream, Func<TInput, TOutput> selector) =>
         (_next, _selector) = (nextProcessStream, selector);
 
-    TResult IProcessStream<TInput, TFinal, TResult>.GetResult(ref Builder<TFinal> builder) => _next.GetResult(ref builder);
+    TResult IProcessStream<TInput, TFinal, TResult>.GetResult(ref StreamState<TFinal> state) => _next.GetResult(ref state);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TInput, TFinal>.ProcessNext(ref Builder<TFinal> builder, in TInput input) =>
-        _next.ProcessNext(ref builder, _selector(input));
+    bool IProcessStream<TInput, TFinal>.ProcessNext(ref StreamState<TFinal> state, in TInput input) =>
+        _next.ProcessNext(ref state, _selector(input));
 }

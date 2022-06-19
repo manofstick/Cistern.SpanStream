@@ -10,10 +10,10 @@ public struct SumForward
 
     public SumForward() { _accumulate = 0; }
 
-    int IProcessStream<int, int, int>.GetResult(ref Builder<int> builder) => _accumulate;
+    int IProcessStream<int, int, int>.GetResult(ref StreamState<int> state) => _accumulate;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<int, int>.ProcessNext(ref Builder<int> builder, in int input)
+    bool IProcessStream<int, int>.ProcessNext(ref StreamState<int> state, in int input)
     {
         _accumulate += input;
         return true;

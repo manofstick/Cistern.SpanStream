@@ -35,14 +35,14 @@ struct SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>
     public SelectWhereStream(in TProcessStream nextProcessStream, Func<TInput, TOutput> selector, Func<TOutput, bool> predicate) =>
         (_next, _selector, _predicate) = (nextProcessStream, selector, predicate);
 
-    TResult IProcessStream<TInput, TFinal, TResult>.GetResult(ref Builder<TFinal> builder) => _next.GetResult(ref builder);
+    TResult IProcessStream<TInput, TFinal, TResult>.GetResult(ref StreamState<TFinal> state) => _next.GetResult(ref state);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TInput, TFinal>.ProcessNext(ref Builder<TFinal> builder, in TInput input)
+    bool IProcessStream<TInput, TFinal>.ProcessNext(ref StreamState<TFinal> state, in TInput input)
     {
         var u = _selector(input);
         if (_predicate(u))
-            return _next.ProcessNext(ref builder, u);
+            return _next.ProcessNext(ref state, u);
         return true;
     }
 }

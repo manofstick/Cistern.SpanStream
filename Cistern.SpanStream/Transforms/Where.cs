@@ -33,9 +33,9 @@ struct WhereStream<TCurrent, TFinal, TResult, TProcessStream>
     public WhereStream(in TProcessStream nextProcessStream, Func<TCurrent, bool> predicate) =>
         (_next, _predicate) = (nextProcessStream, predicate);
 
-    TResult IProcessStream<TCurrent, TFinal, TResult>.GetResult(ref Builder<TFinal> builder) => _next.GetResult(ref builder);
+    TResult IProcessStream<TCurrent, TFinal, TResult>.GetResult(ref StreamState<TFinal> state) => _next.GetResult(ref state);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TCurrent, TFinal>.ProcessNext(ref Builder<TFinal> builder, in TCurrent input) =>
-        !_predicate(input) || _next.ProcessNext(ref builder, input);
+    bool IProcessStream<TCurrent, TFinal>.ProcessNext(ref StreamState<TFinal> state, in TCurrent input) =>
+        !_predicate(input) || _next.ProcessNext(ref state, input);
 }

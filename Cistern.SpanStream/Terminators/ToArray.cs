@@ -8,12 +8,12 @@ public struct ToArray<T>
 {
     public ToArray() { }
 
-    T[] IProcessStream<T, T, T[]>.GetResult(ref Builder<T> builder) => builder.ToArray();
+    T[] IProcessStream<T, T, T[]>.GetResult(ref StreamState<T> state) => state.ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<T, T>.ProcessNext(ref Builder<T> builder, in T input)
+    bool IProcessStream<T, T>.ProcessNext(ref StreamState<T> state, in T input)
     {
-        builder.Add(input);
+        state.Add(input);
         return true;
     }
 }
@@ -26,7 +26,7 @@ public struct ToArrayKnownSize<T>
 
     public ToArrayKnownSize(T[] arrayToFill) => (_array, _index) = (arrayToFill, 0);
 
-    T[] IProcessStream<T, T, T[]>.GetResult(ref Builder<T> builder)
+    T[] IProcessStream<T, T, T[]>.GetResult(ref StreamState<T> state)
     {
         if (_array.Length != _index)
             ToArrayKnownSize<T>.DidntFillArray();
@@ -36,7 +36,7 @@ public struct ToArrayKnownSize<T>
     private static void DidntFillArray() => throw new Exception("_array.Length != _index");
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<T, T>.ProcessNext(ref Builder<T> builder, in T input)
+    bool IProcessStream<T, T>.ProcessNext(ref StreamState<T> state, in T input)
     {
         _array[_index++] = input;
         return true;

@@ -21,11 +21,11 @@ public readonly struct WhereSelectRoot<TInput, TOutput>
     struct Execute
         : IExecuteIterator<TInput, TOutput, (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector)>
     {
-        TResult IExecuteIterator<TInput, TOutput, (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector)>.Execute<TCurrent, TResult, TProcessStream>(ref Builder<TCurrent> builder, ref Span<TInput> span, in TProcessStream stream, in (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector) state)
+        TResult IExecuteIterator<TInput, TOutput, (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector)>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, ref Span<TInput> span, in TProcessStream stream, in (Func<TInput, bool> Predicate, Func<TInput, TOutput> Selector) args)
         {
             var localCopy = stream;
-            Iterator.WhereSelect(ref builder, span, ref localCopy, state.Predicate, state.Selector);
-            return localCopy.GetResult(ref builder);
+            Iterator.WhereSelect(ref state, span, ref localCopy, args.Predicate, args.Selector);
+            return localCopy.GetResult(ref state);
         }
     }
 

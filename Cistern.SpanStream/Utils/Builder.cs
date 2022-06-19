@@ -78,18 +78,18 @@ internal static class StackAllocator
             Allocate<T, Chunk>(requiredSize, currentSize);
     }
 
-    public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TState, TExecution>(int requiredSize, ref Span<TInitial> span, in TProcessStream stream, in TState state)
+    public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution>(int requiredSize, ref Span<TInitial> span, in TProcessStream stream, in TArgs args)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
-        where TExecution : struct, IExecuteIterator<TInitial, TNext, TState>
+        where TExecution : struct, IExecuteIterator<TInitial, TNext, TArgs>
     {
-        Builder<TCurrent> builder = default;
+        StreamState<TCurrent> state = default;
 
-        return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref builder, ref span, in stream, in state);
+        return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref state, ref span, in stream, in args);
     }
 }
 
 
-public ref struct Builder<T>
+public ref struct StreamState<T>
 {
     readonly ArrayPool<T>? _maybePool;
     readonly Span<T> _root;
@@ -103,7 +103,7 @@ public ref struct Builder<T>
 
     int _count;
 
-    public Builder(ArrayPool<T>? maybePool, Span<T[]?> bufferStore, Span<T> initalBuffer, int? upperBound)
+    public StreamState(ArrayPool<T>? maybePool, Span<T[]?> bufferStore, Span<T> initalBuffer, int? upperBound)
     {
         _maybePool = maybePool;
         _upperBound = upperBound;

@@ -13,10 +13,10 @@ public struct Aggregate<T, TAccumulate>
 
     private TAccumulate _accumulate;
 
-    TAccumulate IProcessStream<T, T, TAccumulate>.GetResult(ref Builder<T> builder) => _accumulate;
+    TAccumulate IProcessStream<T, T, TAccumulate>.GetResult(ref StreamState<T> state) => _accumulate;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<T, T>.ProcessNext(ref Builder<T> builder, in T input)
+    bool IProcessStream<T, T>.ProcessNext(ref StreamState<T> state, in T input)
     {
         _accumulate = _func(_accumulate, input);
         return true;

@@ -21,11 +21,11 @@ public readonly struct SelectRoot<TInput, TOutput>
     struct Execute
         : IExecuteIterator<TInput, TOutput, Func<TInput, TOutput>>
     {
-        TResult IExecuteIterator<TInput, TOutput, Func<TInput, TOutput>>.Execute<TFinal, TResult, TProcessStream>(ref Builder<TFinal> builder, ref Span<TInput> span, in TProcessStream stream, in Func<TInput, TOutput> selector)
+        TResult IExecuteIterator<TInput, TOutput, Func<TInput, TOutput>>.Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> state, ref Span<TInput> span, in TProcessStream stream, in Func<TInput, TOutput> selector)
         {
             var localCopy = stream;
-            Iterator.Select(ref builder, span, ref localCopy, selector);
-            return localCopy.GetResult(ref builder);
+            Iterator.Select(ref state, span, ref localCopy, selector);
+            return localCopy.GetResult(ref state);
         }
     }
 
