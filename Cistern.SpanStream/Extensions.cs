@@ -220,6 +220,10 @@ namespace Cistern.SpanStream
             where TNode : struct, IStreamNode<TInitial, TCurrent>
         {
             var maybeSize = source.TryGetSize(out var upperBound);
+
+            if (upperBound == 0)
+                return Array.Empty<TCurrent>();
+
             if (maybeSize.HasValue)
                 return source.Execute<TCurrent[], ToArrayKnownSize<TCurrent>>(new(new TCurrent[maybeSize.Value]));
 
