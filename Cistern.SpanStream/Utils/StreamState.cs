@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Cistern.Utils;
 
-internal static class StackAllocator
+internal static class LargeStackAllocator
 {
     internal interface IAfterAllocation<TInitial, TNext, TState>
     {
@@ -14,36 +14,36 @@ internal static class StackAllocator
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BufferStorage<T>
     {
-        public T[]? _01;
-        public T[]? _02;
-        public T[]? _03;
-        public T[]? _04;
-        public T[]? _05;
-        public T[]? _06;
-        public T[]? _07;
-        public T[]? _08;
-        public T[]? _09;
-        public T[]? _10;
-        public T[]? _11;
-        public T[]? _12;
-        public T[]? _13;
-        public T[]? _14;
-        public T[]? _15;
-        public T[]? _16;
-        public T[]? _17;
-        public T[]? _18;
-        public T[]? _19;
-        public T[]? _20;
-        public T[]? _21;
-        public T[]? _22;
-        public T[]? _23;
-        public T[]? _24;
-        public T[]? _25;
-        public T[]? _26;
-        public T[]? _27;
-        public T[]? _28;
-        public T[]? _29;
-        public T[]? _30;
+        public T _01;
+        public T _02;
+        public T _03;
+        public T _04;
+        public T _05;
+        public T _06;
+        public T _07;
+        public T _08;
+        public T _09;
+        public T _10;
+        public T _11;
+        public T _12;
+        public T _13;
+        public T _14;
+        public T _15;
+        public T _16;
+        public T _17;
+        public T _18;
+        public T _19;
+        public T _20;
+        public T _21;
+        public T _22;
+        public T _23;
+        public T _24;
+        public T _25;
+        public T _26;
+        public T _27;
+        public T _28;
+        public T _29;
+        public T _30;
 
         public const int NumberOfElements = 30;
     }
@@ -69,7 +69,7 @@ internal static class StackAllocator
         where TCurrentChunk : struct
     {
         MemoryChunk<TCurrent, TCurrentChunk> chunkOfStackSpace = default;
-        BufferStorage<TCurrent> bufferStorage = default;
+        BufferStorage<TCurrent[]?> bufferStorage = default;
 
         var spanOfTCurrent = MemoryMarshal.CreateSpan(ref chunkOfStackSpace.Head, currentSize);
         var spanOfTCurrentArray = MemoryMarshal.CreateSpan(ref bufferStorage._01, BufferStorage<TCurrent>.NumberOfElements);
@@ -91,19 +91,11 @@ internal static class StackAllocator
             return AllocateAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(in span, in stream, in args, requiredSize, currentSize);
     }
 
-    public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution>(int? stackAllocationCount, in ReadOnlySpan<TInitial> span, in TProcessStream stream, in TArgs args)
+    public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution>(int stackAllocationCount, in ReadOnlySpan<TInitial> span, in TProcessStream stream, in TArgs args)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
         where TExecution : struct, IAfterAllocation<TInitial, TNext, TArgs>
     {
-        if (stackAllocationCount > 0)
-        {
-            return BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, SequentialDataPair<SequentialDataPair<SequentialDataPair<SequentialDataPair<TCurrent>>>>>(in span, in stream, in args, stackAllocationCount.Value, 17);
-        }
-        else
-        {
-            StreamState<TCurrent> state = default;
-            return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref state, in span, in stream, in args);
-        }
+        return BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, SequentialDataPair<BufferStorage<TCurrent>>>(in span, in stream, in args, stackAllocationCount, (BufferStorage<TCurrent>.NumberOfElements * 2) + 1/*Head*/);
     }
 }
 
