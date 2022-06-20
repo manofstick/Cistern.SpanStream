@@ -17,7 +17,7 @@ public readonly struct Root<TInitial>
     struct Execute
         : StackAllocator.IAfterAllocation<TInitial, TInitial, Null>
     {
-        TResult StackAllocator.IAfterAllocation<TInitial, TInitial, Null>.Execute<TTerminatorState, TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent, TTerminatorState> builder, ref Span<TInitial> span, in TProcessStream stream, in Null selector)
+        TResult StackAllocator.IAfterAllocation<TInitial, TInitial, Null>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> builder, ref Span<TInitial> span, in TProcessStream stream, in Null selector)
         {
             var localCopy = stream;
             Iterator.Vanilla(ref builder, span, ref localCopy);
@@ -25,10 +25,10 @@ public readonly struct Root<TInitial>
         }
     }
 
-    TResult IStreamNode<TInitial>.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
+    TResult IStreamNode<TInitial>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> spanAsSourceDuplicate, int? stackAllocationCount, in TProcessStream processStream)
     {
         var span = Unsafe.SpanCast<TInitialDuplicate, TInitial>(spanAsSourceDuplicate);
 
-        return StackAllocator.Execute<TTerminatorState, TInitial, TInitial, TFinal, TResult, TProcessStream, Null, Execute>(stackAllocationCount, ref span, in processStream, default);
+        return StackAllocator.Execute<TInitial, TInitial, TFinal, TResult, TProcessStream, Null, Execute>(stackAllocationCount, ref span, in processStream, default);
     }
 }

@@ -3,19 +3,17 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Terminators;
 
-public struct SumForwardState { }
-
 public struct SumForward
-    : IProcessStream<SumForwardState, int, int, int>
+    : IProcessStream<int, int, int>
 {
     private int _accumulate;
 
     public SumForward() { _accumulate = 0; }
 
-    int IProcessStream<SumForwardState, int, int, int>.GetResult(ref StreamState<int, SumForwardState> state) => _accumulate;
+    int IProcessStream<int, int, int>.GetResult(ref StreamState<int> state) => _accumulate;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<SumForwardState, int, int>.ProcessNext(ref StreamState<int, SumForwardState> state, in int input)
+    bool IProcessStream<int, int>.ProcessNext(ref StreamState<int> state, in int input)
     {
         _accumulate += input;
         return true;

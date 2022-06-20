@@ -13,7 +13,7 @@ public struct ToArrayState<T>
     int _nextIdx;
     int _count;
 
-    public void Dispose(ref StreamState<T, ToArrayState<T>> container)
+    public void Dispose(ref StreamState<T> container)
     {
         if (_maybePool == null)
             return;
@@ -22,7 +22,7 @@ public struct ToArrayState<T>
             _maybePool.Return(container.Buffers[idx]!);
     }
 
-    public void Add(ref StreamState<T, ToArrayState<T>> container, T item)
+    public void Add(ref StreamState<T> container, T item)
     {
         if (_nextIdx == container.Current.Length)
             AllocateNext(ref container);
@@ -32,7 +32,7 @@ public struct ToArrayState<T>
         ++_count;
         ++_nextIdx;
     }
-    private void AllocateNext(ref StreamState<T, ToArrayState<T>> container)
+    private void AllocateNext(ref StreamState<T> container)
     {
         var nextSize = container.Current.Length * 2;
         if (_count + nextSize > _upperBound)
@@ -51,7 +51,7 @@ public struct ToArrayState<T>
         _nextIdx = 0;
     }
 
-    public T[] ToArray(ref StreamState<T, ToArrayState<T>> x)
+    public T[] ToArray(ref StreamState<T> x)
     {
         if (_count == 0)
             return Array.Empty<T>();
@@ -107,31 +107,31 @@ public struct ToArrayState<T>
 }
 
 public struct ToArray<T>
-    : IProcessStream<ToArrayState<T>, T, T, T[]>
+    : IProcessStream<T, T, T[]>
 {
-    public ToArray() { }
+    ToArrayState<T> _state;
 
-    T[] IProcessStream<ToArrayState<T>, T, T, T[]>.GetResult(ref StreamState<T, ToArrayState<T>> state) => state.State.ToArray(ref state);
+    public ToArray() => _state = default;
+
+    T[] IProcessStream<T, T, T[]>.GetResult(ref StreamState<T> state) => _state.ToArray(ref state);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<ToArrayState<T>, T, T>.ProcessNext(ref StreamState<T, ToArrayState<T>> state, in T input)
+    bool IProcessStream<T, T>.ProcessNext(ref StreamState<T> state, in T input)
     {
-        state.State.Add(ref state, input);
+        _state.Add(ref state, input);
         return true;
     }
 }
 
-struct TempState { }
-
 public struct ToArrayKnownSize<T>
-    : IProcessStream<TempState, T, T, T[]>
+    : IProcessStream<T, T, T[]>
 {
     private T[] _array;
     private int _index;
 
     public ToArrayKnownSize(T[] arrayToFill) => (_array, _index) = (arrayToFill, 0);
 
-    T[] IProcessStream<TempState, T, T, T[]>.GetResult(ref StreamState<T, TempState> state)
+    T[] IProcessStream<T, T, T[]>.GetResult(ref StreamState<T> state)
     {
         if (_array.Length != _index)
             ToArrayKnownSize<T>.DidntFillArray();
@@ -141,7 +141,7 @@ public struct ToArrayKnownSize<T>
     private static void DidntFillArray() => throw new Exception("_array.Length != _index");
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TempState, T, T>.ProcessNext(ref StreamState<T, TempState> state, in T input)
+    bool IProcessStream<T, T>.ProcessNext(ref StreamState<T> state, in T input)
     {
         _array[_index++] = input;
         return true;

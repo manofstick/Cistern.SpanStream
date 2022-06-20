@@ -19,13 +19,13 @@ public readonly struct Where<TCurrent, TPriorNode>
         return 0;
     }
 
-    TResult IStreamNode<TCurrent>.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
-        Node.Execute<TTerminatorState, TInitialDuplicate, TFinal, TResult, WhereStream<TTerminatorState, TCurrent, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Predicate));
+    TResult IStreamNode<TCurrent>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
+        Node.Execute<TInitialDuplicate, TFinal, TResult, WhereStream<TCurrent, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Predicate));
 }
 
-struct WhereStream<TTerminatorState, TCurrent, TFinal, TResult, TProcessStream>
-    : IProcessStream<TTerminatorState, TCurrent, TFinal, TResult>
-    where TProcessStream : struct, IProcessStream<TTerminatorState, TCurrent, TFinal, TResult>
+struct WhereStream<TCurrent, TFinal, TResult, TProcessStream>
+    : IProcessStream<TCurrent, TFinal, TResult>
+    where TProcessStream : struct, IProcessStream<TCurrent, TFinal, TResult>
 {
     /* can't be readonly */ TProcessStream _next;
     readonly Func<TCurrent, bool> _predicate;
@@ -33,9 +33,9 @@ struct WhereStream<TTerminatorState, TCurrent, TFinal, TResult, TProcessStream>
     public WhereStream(in TProcessStream nextProcessStream, Func<TCurrent, bool> predicate) =>
         (_next, _predicate) = (nextProcessStream, predicate);
 
-    TResult IProcessStream<TTerminatorState, TCurrent, TFinal, TResult>.GetResult(ref StreamState<TFinal, TTerminatorState> state) => _next.GetResult(ref state);
+    TResult IProcessStream<TCurrent, TFinal, TResult>.GetResult(ref StreamState<TFinal> state) => _next.GetResult(ref state);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IProcessStream<TTerminatorState, TCurrent, TFinal>.ProcessNext(ref StreamState<TFinal, TTerminatorState> state, in TCurrent input) =>
+    bool IProcessStream<TCurrent, TFinal>.ProcessNext(ref StreamState<TFinal> state, in TCurrent input) =>
         !_predicate(input) || _next.ProcessNext(ref state, input);
 }
