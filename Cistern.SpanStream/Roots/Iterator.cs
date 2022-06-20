@@ -70,6 +70,9 @@ namespace Cistern.SpanStream.Roots
         }
         internal static TFinal[] SelectToArray<TInitial, TFinal>(in ReadOnlySpan<TInitial> span, Func<TInitial, TFinal> selector)
         {
+            if (span.Length == 0)
+                return Array.Empty<TFinal>();
+
             var s = span;
             var result = new TFinal[s.Length];
             for (var i = 0; i < s.Length; ++i)
