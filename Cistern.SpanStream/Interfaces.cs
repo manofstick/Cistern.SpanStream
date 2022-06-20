@@ -13,9 +13,9 @@ public interface IProcessStream<TInput, TFinal, TResult>
     TResult GetResult(ref StreamState<TFinal> builder);
 }
 
-public interface IStreamNode<TInput>
+public interface IStreamNode<TInitial, TInput>
 {
     int? TryGetSize(int sourceSize, out int upperBound);
-    TResult Execute<TInitialDuplicate, TFinal, TResult, TNextInChain>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TNextInChain fenum)
+    TResult Execute<TFinal, TResult, TNextInChain>(in ReadOnlySpan<TInitial> span, int? stackAllocationCount, in TNextInChain fenum)
         where TNextInChain : struct, IProcessStream<TInput, TFinal, TResult>;
 }

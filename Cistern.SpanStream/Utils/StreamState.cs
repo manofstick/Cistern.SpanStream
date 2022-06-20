@@ -7,7 +7,7 @@ internal static class StackAllocator
 {
     internal interface IAfterAllocation<TInitial, TNext, TState>
     {
-        TResult Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> builder, ref Span<TInitial> span, in TProcessStream stream, in TState state)
+        TResult Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> builder, in ReadOnlySpan<TInitial>  span, in TProcessStream stream, in TState state)
             where TProcessStream : struct, IProcessStream<TNext, TFinal, TResult>;
     }
 
@@ -63,7 +63,7 @@ internal static class StackAllocator
         public TChunk Tail;
     }
 
-    static TResult AllocateAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(ref Span<TInitial> span, in TProcessStream stream, in TArgs args, int requiredSize, int currentSize)
+    static TResult AllocateAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(in ReadOnlySpan<TInitial>  span, in TProcessStream stream, in TArgs args, int requiredSize, int currentSize)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
         where TExecution : struct, IAfterAllocation<TInitial, TNext, TArgs>
         where TCurrentChunk : struct
@@ -75,10 +75,10 @@ internal static class StackAllocator
         var spanOfTCurrentArray = MemoryMarshal.CreateSpan(ref bufferStorage._01, BufferStorage<TCurrent>.NumberOfElements);
 
         StreamState<TCurrent> state = new(spanOfTCurrentArray, spanOfTCurrent);
-        return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref state, ref span, in stream, in args);
+        return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref state, in span, in stream, in args);
     }
 
-    static TResult BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(ref Span<TInitial> span, in TProcessStream stream, in TArgs args, int requiredSize, int currentSize)
+    static TResult BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(in ReadOnlySpan<TInitial>  span, in TProcessStream stream, in TArgs args, int requiredSize, int currentSize)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
         where TExecution : struct, IAfterAllocation<TInitial, TNext, TArgs>
         where TCurrentChunk :struct
@@ -86,23 +86,23 @@ internal static class StackAllocator
         var nextSizeUp = ((currentSize - 1) * 2) + 1;
 
         if (currentSize < requiredSize)
-            return BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, SequentialDataPair<TCurrentChunk>>(ref span, in stream, in args, requiredSize, nextSizeUp);
+            return BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, SequentialDataPair<TCurrentChunk>>(in span, in stream, in args, requiredSize, nextSizeUp);
         else
-            return AllocateAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(ref span, in stream, in args, requiredSize, currentSize);
+            return AllocateAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(in span, in stream, in args, requiredSize, currentSize);
     }
 
-    public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution>(int? stackAllocationCount, ref Span<TInitial> span, in TProcessStream stream, in TArgs args)
+    public static TResult Execute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution>(int? stackAllocationCount, in ReadOnlySpan<TInitial> span, in TProcessStream stream, in TArgs args)
         where TProcessStream : struct, IProcessStream<TNext, TCurrent, TResult>
         where TExecution : struct, IAfterAllocation<TInitial, TNext, TArgs>
     {
         if (stackAllocationCount > 0)
         {
-            return BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, SequentialDataPair<SequentialDataPair<SequentialDataPair<SequentialDataPair<TCurrent>>>>>(ref span, in stream, in args, stackAllocationCount.Value, 17);
+            return BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, SequentialDataPair<SequentialDataPair<SequentialDataPair<SequentialDataPair<TCurrent>>>>>(in span, in stream, in args, stackAllocationCount.Value, 17);
         }
         else
         {
             StreamState<TCurrent> state = default;
-            return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref state, ref span, in stream, in args);
+            return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref state, in span, in stream, in args);
         }
     }
 }

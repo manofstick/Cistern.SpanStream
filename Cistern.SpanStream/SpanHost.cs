@@ -1,7 +1,7 @@
 ﻿namespace Cistern.SpanStream;
 
 public readonly ref struct SpanHost<TInitial, TCurrent, TStreamNode>
-    where TStreamNode : struct, IStreamNode<TCurrent>
+    where TStreamNode : struct, IStreamNode<TInitial, TCurrent>
 {
     public readonly ReadOnlySpan<TInitial> Span;
     public readonly TStreamNode Node;
@@ -17,5 +17,5 @@ public readonly ref struct SpanHost<TInitial, TCurrent, TStreamNode>
 
     public TResult Execute<TResult, TProcessStream>(in TProcessStream finalNode, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TCurrent, TCurrent, TResult> =>
-        Node.Execute<TInitial, TCurrent, TResult, TProcessStream>(Span, stackAllocationCount, finalNode);
+        Node.Execute<TCurrent, TResult, TProcessStream>(Span, stackAllocationCount, finalNode);
 }

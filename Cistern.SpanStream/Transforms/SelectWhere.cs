@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
-public readonly struct SelectWhere<TInput, TOutput, TPriorNode>
-    : IStreamNode<TOutput>
-    where TPriorNode : struct, IStreamNode<TInput>
+public readonly struct SelectWhere<TInitial, TInput, TOutput, TPriorNode>
+    : IStreamNode<TInitial, TOutput>
+    where TPriorNode : struct, IStreamNode<TInitial, TInput>
 {
     public readonly TPriorNode Node;
     private Func<TInput, TOutput> Selector { get; }
@@ -14,14 +14,14 @@ public readonly struct SelectWhere<TInput, TOutput, TPriorNode>
     public SelectWhere(in TPriorNode nodeT, Func<TInput, TOutput> selector, Func<TOutput, bool> predicate) =>
         (Node, Selector, Predicate) = (nodeT, selector, predicate);
 
-    int? IStreamNode<TOutput>.TryGetSize(int sourceSize, out int upperBound)
+    int? IStreamNode<TInitial, TOutput>.TryGetSize(int sourceSize, out int upperBound)
     {
         Node.TryGetSize(sourceSize, out upperBound);
         return 0;
     }
 
-    TResult IStreamNode<TOutput>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
-        Node.Execute<TInitialDuplicate, TFinal, TResult, SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Selector, Predicate));
+    TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitial> span, int? stackAllocationCount, in TProcessStream processStream) =>
+        Node.Execute<TFinal, TResult, SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Selector, Predicate));
 }
 
 struct SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>

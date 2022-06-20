@@ -14,7 +14,7 @@ namespace Cistern.SpanStream
         // -----
 
         public static TAccumulate Aggregate<TInitial, TCurrent, TNode, TAccumulate>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TCurrent, TAccumulate> func)
-            where TNode : struct, IStreamNode<TCurrent> =>
+            where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             source.Execute<TAccumulate, Aggregate<TCurrent, TAccumulate>>(new(func, seed));
 
         //- [ ] `TResult Aggregate<TInitial, TAccumulate, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TInitial, TAccumulate> func, Func<TAccumulate, TResult> resultSelector);`
@@ -161,11 +161,11 @@ namespace Cistern.SpanStream
             new(source.Span, new(selector));
         public static SpanHost<TCurrent, TNext, WhereSelectRoot<TCurrent, TNext>> Select<TCurrent, TNext>(this in SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>> source, Func<TCurrent, TNext> selector) =>
             new(source.Span, new(source.Node.Predicate, selector));
-        public static SpanHost<TInitial, TNext, WhereSelect<TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TCurrent, Where<TCurrent, TNode>> source, Func<TCurrent, TNext> selector)
-            where TNode : struct, IStreamNode<TCurrent> =>
+        public static SpanHost<TInitial, TNext, WhereSelect<TInitial, TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TCurrent, Where<TInitial, TCurrent, TNode>> source, Func<TCurrent, TNext> selector)
+            where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             new(source.Span, new(in source.Node.Node, source.Node.Predicate, selector));
-        public static SpanHost<TInitial, TNext, Select<TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
-            where TNode : struct, IStreamNode<TCurrent> =>
+        public static SpanHost<TInitial, TNext, Select<TInitial, TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
+            where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             new(source.Span, new(in source.Node, selector));
 
         //- [ ] `IEnumerable<TResult> Select<TInitial, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, TResult> selector);`
@@ -217,7 +217,7 @@ namespace Cistern.SpanStream
         //- [ ] `IOrderedEnumerable<TInitial> ThenByDescending<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
 
         public static TCurrent[] ToArray<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source)
-            where TNode : struct, IStreamNode<TCurrent>
+            where TNode : struct, IStreamNode<TInitial, TCurrent>
         {
             var maybeSize = source.TryGetSize(out var upperBound);
             if (maybeSize.HasValue)
@@ -252,11 +252,11 @@ namespace Cistern.SpanStream
             new(source.Span, new(predicate));
         public static SpanHost<TInitial, TCurrent, SelectWhereRoot<TInitial, TCurrent>> Where<TInitial, TCurrent>(this in SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source, Func<TCurrent, bool> predicate) =>
             new(source.Span, new(source.Node.Selector, predicate));
-        public static SpanHost<TInitial, TNext, SelectWhere<TCurrent, TNext, TNode>> Where<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TNext, Select<TCurrent, TNext, TNode>> source, Func<TNext, bool> predicate)
-            where TNode : struct, IStreamNode<TCurrent> =>
+        public static SpanHost<TInitial, TNext, SelectWhere<TInitial, TCurrent, TNext, TNode>> Where<TInitial, TCurrent, TNext, TNode>(this in SpanHost<TInitial, TNext, Select<TInitial, TCurrent, TNext, TNode>> source, Func<TNext, bool> predicate)
+            where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             new(source.Span, new(in source.Node.Node, source.Node.Selector, predicate));
-        public static SpanHost<TInitial, TCurrent, Where<TCurrent, TNode>> Where<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
-            where TNode : struct, IStreamNode<TCurrent> =>
+        public static SpanHost<TInitial, TCurrent, Where<TInitial, TCurrent, TNode>> Where<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
+            where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             new(source.Span, new(in source.Node, predicate));
 
         //- [ ] `IEnumerable<TInitial> Where<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, bool> predicate);`

@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
-public readonly struct Where<TCurrent, TPriorNode>
-    : IStreamNode<TCurrent>
-    where TPriorNode : struct, IStreamNode<TCurrent>
+public readonly struct Where<TInitial, TCurrent, TPriorNode>
+    : IStreamNode<TInitial, TCurrent>
+    where TPriorNode : struct, IStreamNode<TInitial, TCurrent>
 {
     public readonly TPriorNode Node;
     public Func<TCurrent, bool> Predicate { get; }
@@ -13,14 +13,14 @@ public readonly struct Where<TCurrent, TPriorNode>
     public Where(in TPriorNode nodeT, Func<TCurrent, bool> predicate) =>
         (Node, Predicate) = (nodeT, predicate);
 
-    int? IStreamNode<TCurrent>.TryGetSize(int sourceSize, out int upperBound)
+    int? IStreamNode<TInitial, TCurrent>.TryGetSize(int sourceSize, out int upperBound)
     {
         Node.TryGetSize(sourceSize, out upperBound);
         return 0;
     }
 
-    TResult IStreamNode<TCurrent>.Execute<TInitialDuplicate, TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitialDuplicate> span, int? stackAllocationCount, in TProcessStream processStream) =>
-        Node.Execute<TInitialDuplicate, TFinal, TResult, WhereStream<TCurrent, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Predicate));
+    TResult IStreamNode<TInitial, TCurrent>.Execute<TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitial> span, int? stackAllocationCount, in TProcessStream processStream) =>
+        Node.Execute<TFinal, TResult, WhereStream<TCurrent, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Predicate));
 }
 
 struct WhereStream<TCurrent, TFinal, TResult, TProcessStream>
