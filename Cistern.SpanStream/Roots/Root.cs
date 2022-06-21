@@ -14,7 +14,7 @@ public readonly struct Root<TInitial>
 
     struct Null { }
 
-    struct Execute
+    struct Executer
         : LargeStackAllocator.IAfterAllocation<TInitial, TInitial, Null>
     {
         public static TResult Invoke<TFinal, TResult, TProcessStream>(in TProcessStream stream, in ReadOnlySpan<TInitial> span, ref StreamState<TFinal> state)
@@ -29,6 +29,16 @@ public readonly struct Root<TInitial>
             => Invoke<TFinal, TResult, TProcessStream>(in stream, in span, ref state);
     }
 
+    public static TResult Execute<TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+        where TProcessStream : struct, IProcessStream<TInitial, TInitial, TResult>
+    {
+        return Invoke(new Root<TInitial>(), in processStream, in span, stackAllocationCount);
+
+        static TResult Invoke<TRootInitial>(TRootInitial root, in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+            where TRootInitial : IStreamNode<TInitial, TInitial> =>
+            root.Execute<TInitial, TResult, TProcessStream>(in processStream, in span, stackAllocationCount);
+    }
+
     TResult IStreamNode<TInitial, TInitial>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
     {
         if (!stackAllocationCount.HasValue || stackAllocationCount <= 0)
@@ -36,14 +46,14 @@ public readonly struct Root<TInitial>
         else if (stackAllocationCount <= 30)
             return ExecuteSmallStack<TFinal, TResult, TProcessStream>(in processStream, in span);
         else
-            return LargeStackAllocator.Execute<TInitial, TInitial, TFinal, TResult, TProcessStream, Null, Execute>(stackAllocationCount.Value, in span, in processStream, default);
+            return LargeStackAllocator.Execute<TInitial, TInitial, TFinal, TResult, TProcessStream, Null, Executer>(stackAllocationCount.Value, in span, in processStream, default);
     }
 
     private TResult NoStack<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span)
         where TProcessStream : struct, IProcessStream<TInitial, TFinal, TResult>
     {
         StreamState<TFinal> state = default;
-        return Execute.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state);
+        return Executer.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state);
     }
 
     private static TResult ExecuteSmallStack<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span)
@@ -56,6 +66,6 @@ public readonly struct Root<TInitial>
         var spanOfTCurrentArray = MemoryMarshal.CreateSpan(ref bufferStorage._01, LargeStackAllocator.BufferStorage<TFinal[]?>.NumberOfElements);
 
         StreamState<TFinal> state = new(spanOfTCurrentArray, spanOfTCurrent);
-        return Execute.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state);
+        return Executer.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state);
     }
 }

@@ -182,13 +182,13 @@ public class FirstTest
     {
         return
             data.Span
-//            .Where(x => x < 250)
-            .Where(x => x > 128)
-            .Append((byte)10)
-                                    .Select(x => x * 2)
-                                    .Append(17)
-            //            .ToArray();
-            .Aggregate(-59, (a, c) => (a * a) + c, r => -r);
+            ////            .Where(x => x < 250)
+            //            .Where(x => x > 128)
+            //            .Append((byte)10)
+            //                                    .Select(x => x * 2)
+            //                                    .Append(17)
+            //            //            .ToArray();
+            .Aggregate(-59, (a, c) => (a * a) + c);//, r => -r);
     }
 
     [Benchmark]
@@ -196,13 +196,13 @@ public class FirstTest
     {
         return
             _asArray
-            //            .Where(x => x < 250)
-            .Where(x => x > 128)
-            .Append((byte)10)
-                                    .Select(x => x * 2)
-                                    .Append(17)
-            //            .ToArray();
-            .Aggregate(-59, (a, c) => (a*a) + c, r => -r);
+            ////            .Where(x => x < 250)
+            //.Where(x => x > 128)
+            //.Append((byte)10)
+            //                        .Select(x => x * 2)
+            //                        .Append(17)
+            ////            .ToArray();
+            .Aggregate(-59, (a, c) => (a * a) + c);//, r => -r);
     }
 }
 

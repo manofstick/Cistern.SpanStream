@@ -16,6 +16,12 @@ namespace Cistern.SpanStream
 
         // -----
 
+        public static TInitial Aggregate<TInitial>(this in ReadOnlySpan<TInitial> source, Func<TInitial, TInitial, TInitial> func) =>
+            Root<TInitial>.Execute<TInitial, Aggregate<TInitial>>(new(func), source, 0);
+        public static TAccumulate Aggregate<TInitial, TAccumulate>(this in ReadOnlySpan<TInitial> source, TAccumulate seed, Func<TAccumulate, TInitial, TAccumulate> func) =>
+            Root<TInitial>.Execute<TAccumulate, Aggregate<TInitial, TAccumulate>>(new(func, seed), source, 0);
+        public static TResult Aggregate<TInitial, TAccumulate, TResult>(this in ReadOnlySpan<TInitial> source, TAccumulate seed, Func<TAccumulate, TInitial, TAccumulate> func, Func<TAccumulate, TResult> resultSelector) =>
+            Root<TInitial>.Execute<TResult, Aggregate<TInitial, TAccumulate, TResult>>(new(func, seed, resultSelector), source, 0);
         public static TCurrent Aggregate<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TCurrent, TCurrent> func)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             source.Execute<TCurrent, Aggregate<TCurrent>>(new(func));
