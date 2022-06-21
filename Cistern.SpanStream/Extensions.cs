@@ -2,15 +2,17 @@
 using Cistern.SpanStream.Terminators;
 using Cistern.SpanStream.Transforms;
 using System.Buffers;
+using System.Collections.Immutable;
 
 namespace Cistern.SpanStream
 {
     public static class Extensions
     {
-        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in Span<T> span) => new(span, new ());
-        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in ReadOnlySpan<T> span) => new(span, new());
-        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in Memory<T> memory) => new(memory.Span, new());
-        public static SpanHost<T, T, Root<T>> ToSpanStream<T>(this in ReadOnlyMemory<T> memory) => new(memory.Span, new());
+        public static ReadOnlySpan<T> ToReadOnlySpan<T>(this in Span<T> span) => span;
+        public static ReadOnlySpan<T> ToReadOnlySpan<T>(this in Memory<T> memory) => memory.Span;
+        public static ReadOnlySpan<T> ToReadOnlySpan<T>(this in ReadOnlyMemory<T> memory) => memory.Span;
+        public static ReadOnlySpan<T> ToReadOnlySpan<T>(this T[] array) => array;
+        public static ReadOnlySpan<T> ToReadOnlySpan<T>(this ImmutableArray<T> array) => array.AsSpan();
 
         // -----
 
