@@ -112,7 +112,7 @@ public class FirstTest
     }
 
     //[Params(0)]
-    [Params(0, 1, 10, 100, 10000)]
+    [Params(0, 1, 10, 100, 1000)]
     public int N { get; set; }
 
     private ReadOnlyMemory<byte> data;
@@ -224,7 +224,7 @@ public class Program
         //Cistern.Utils.StackAllocator.Allocate<int>(100);
 
         var zz = new FirstTest();
-        zz.N = 100;
+        zz.N = 1;
         zz.GlobalSetup();
 
         //return;

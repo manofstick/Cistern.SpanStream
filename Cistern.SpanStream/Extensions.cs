@@ -1,6 +1,7 @@
 ﻿using Cistern.SpanStream.Roots;
 using Cistern.SpanStream.Terminators;
 using Cistern.SpanStream.Transforms;
+using System.Buffers;
 
 namespace Cistern.SpanStream
 {
@@ -216,7 +217,7 @@ namespace Cistern.SpanStream
         //- [ ] `IOrderedEnumerable<TInitial> ThenByDescending<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector);`
         //- [ ] `IOrderedEnumerable<TInitial> ThenByDescending<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
 
-        public static TCurrent[] ToArray<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source)
+        public static TCurrent[] ToArray<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, int stackElementCount, ArrayPool<TCurrent>? maybeArrayPool)
             where TNode : struct, IStreamNode<TInitial, TCurrent>
         {
             var maybeSize = source.TryGetSize(out var upperBound);
@@ -227,8 +228,12 @@ namespace Cistern.SpanStream
             if (maybeSize.HasValue)
                 return source.Execute<TCurrent[], ToArrayKnownSize<TCurrent>>(new(new TCurrent[maybeSize.Value]));
 
-            return source.Execute<TCurrent[], ToArray<TCurrent>>(new(), source.Span.Length);
+            return source.Execute<TCurrent[], ToArray<TCurrent>>(new(upperBound, maybeArrayPool), Math.Min(upperBound, stackElementCount));
         }
+
+        public static TCurrent[] ToArray<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, int stackElementCount = 100, bool useSharedPool = false)
+            where TNode : struct, IStreamNode<TInitial, TCurrent>
+            => source.ToArray(stackElementCount, useSharedPool ? ArrayPool<TCurrent>.Shared : null);
 
         public static TCurrent[] ToArray<TInitial, TCurrent>(this in SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source)
             => Iterator.SelectToArray(source.Span, source.Node.Selector);

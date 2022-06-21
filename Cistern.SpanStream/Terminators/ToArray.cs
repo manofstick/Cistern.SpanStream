@@ -4,14 +4,24 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Terminators;
 
-public struct ToArrayState<T>
+public struct ArrayBuilder<T>
 {
+    readonly int _upperBound;
     readonly ArrayPool<T>? _maybePool;
-    readonly int? _upperBound;
 
     int _bufferCount;
     int _nextIdx;
     int _count;
+
+    public ArrayBuilder(int upperBound, ArrayPool<T>? maybePool)
+    {
+        _upperBound = upperBound;
+        _maybePool = maybePool;
+
+        _bufferCount = 0;
+        _nextIdx = 0;
+        _count = 0;
+    }
 
     public void Dispose(ref StreamState<T> container)
     {
@@ -22,22 +32,22 @@ public struct ToArrayState<T>
             _maybePool.Return(container.Buffers[idx]!);
     }
 
-    public void Add(ref StreamState<T> container, T item)
+    public ref T GetNextCell(ref StreamState<T> container)
     {
         if (_nextIdx == container.Current.Length)
             AllocateNext(ref container);
 
-        container.Current[_nextIdx] = item;
-
         ++_count;
         ++_nextIdx;
+
+        return ref container.Current[_nextIdx-1];
     }
     private void AllocateNext(ref StreamState<T> container)
     {
         var nextSize = container.Current.Length * 2;
         if (_count + nextSize > _upperBound)
         {
-            nextSize = _upperBound.Value - _count;
+            nextSize = _upperBound - _count;
             if (nextSize <= 0)
                 throw new IndexOutOfRangeException("Enumerator length has exceeded original count");
         }
@@ -109,16 +119,24 @@ public struct ToArrayState<T>
 public struct ToArray<T>
     : IProcessStream<T, T, T[]>
 {
-    ToArrayState<T> _state;
+    ArrayBuilder<T> _builder;
 
-    public ToArray() => _state = default;
+    public ToArray(int upperBound, ArrayPool<T>? maybePool)
+    { 
+        _builder = new (upperBound, maybePool);
+    }
 
-    T[] IProcessStream<T, T, T[]>.GetResult(ref StreamState<T> state) => _state.ToArray(ref state);
+    T[] IProcessStream<T, T, T[]>.GetResult(ref StreamState<T> state)
+    {
+        var array = _builder.ToArray(ref state);
+        _builder.Dispose(ref state);
+        return array;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool IProcessStream<T, T>.ProcessNext(ref StreamState<T> state, in T input)
     {
-        _state.Add(ref state, input);
+        _builder.GetNextCell(ref state) = input;
         return true;
     }
 }
