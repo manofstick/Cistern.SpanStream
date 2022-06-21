@@ -159,7 +159,7 @@ public class FirstTest
         //var x = ImmutableArray.CreateBuilder<int>();
         //var x = new int[data.Length];
         //var idx = 0;
-        var accumulate = 0;
+        var accumulate = -59;
         foreach(var item in data.Span)
         {
             byte i = item ;
@@ -173,7 +173,7 @@ public class FirstTest
                 }
             }
         }
-        return accumulate;
+        return -accumulate;
         //return x.ToArray();
     }
 
@@ -186,7 +186,7 @@ public class FirstTest
             .Where(x => x > 128)
                                     .Select(x => x * 2)
             //            .ToArray();
-            .Aggregate((a, c) => a + c);
+            .Aggregate(-59, (a, c) => a + c, r => -r);
     }
 
     [Benchmark]
@@ -198,7 +198,7 @@ public class FirstTest
             .Where(x => x > 128)
                                     .Select(x => x * 2)
             //            .ToArray();
-            .Aggregate((a, c) => a + c);
+            .Aggregate(-59, (a, c) => a + c, r => -r);
     }
 }
 

@@ -48,3 +48,24 @@ public struct Aggregate<T, TAccumulate>
         return true;
     }
 }
+
+public struct Aggregate<T, TAccumulate, TResult>
+    : IProcessStream<T, T, TResult>
+{
+    private readonly Func<TAccumulate, T, TAccumulate> _func;
+    private readonly Func<TAccumulate, TResult> _resultSelector;
+
+    public Aggregate(Func<TAccumulate, T, TAccumulate> func, TAccumulate seed, Func<TAccumulate, TResult> resultSelector) =>
+        (_func, _accumulate, _resultSelector) = (func, seed, resultSelector);
+
+    private TAccumulate _accumulate;
+
+    TResult IProcessStream<T, T, TResult>.GetResult(ref StreamState<T> state) => _resultSelector(_accumulate);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool IProcessStream<T, T>.ProcessNext(ref StreamState<T> state, in T input)
+    {
+        _accumulate = _func(_accumulate, input);
+        return true;
+    }
+}

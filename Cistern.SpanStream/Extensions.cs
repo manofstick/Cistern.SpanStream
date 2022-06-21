@@ -17,12 +17,13 @@ namespace Cistern.SpanStream
         public static TCurrent Aggregate<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TCurrent, TCurrent> func)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             source.Execute<TCurrent, Aggregate<TCurrent>>(new(func));
-
         public static TAccumulate Aggregate<TInitial, TCurrent, TNode, TAccumulate>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TCurrent, TAccumulate> func)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             source.Execute<TAccumulate, Aggregate<TCurrent, TAccumulate>>(new(func, seed));
+        public static TResult Aggregate<TInitial, TCurrent, TNode, TAccumulate, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TCurrent, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
+            where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+            source.Execute<TResult, Aggregate<TCurrent, TAccumulate, TResult>>(new(func, seed, resultSelector));
 
-        //- [ ] `TResult Aggregate<TInitial, TAccumulate, TResult>(this in SpanHost<TInitial, TCurrent, TNode> source, TAccumulate seed, Func<TAccumulate, TInitial, TAccumulate> func, Func<TAccumulate, TResult> resultSelector);`
         //- [ ] `bool All<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
         //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
         //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
