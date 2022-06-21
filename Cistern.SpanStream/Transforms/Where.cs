@@ -19,8 +19,8 @@ public readonly struct Where<TInitial, TCurrent, TPriorNode>
         return 0;
     }
 
-    TResult IStreamNode<TInitial, TCurrent>.Execute<TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitial> span, int? stackAllocationCount, in TProcessStream processStream) =>
-        Node.Execute<TFinal, TResult, WhereStream<TCurrent, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Predicate));
+    TResult IStreamNode<TInitial, TCurrent>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
+        Node.Execute<TFinal, TResult, WhereStream<TCurrent, TFinal, TResult, TProcessStream>>(new(in processStream, Predicate), in span, stackAllocationCount);
 }
 
 struct WhereStream<TCurrent, TFinal, TResult, TProcessStream>

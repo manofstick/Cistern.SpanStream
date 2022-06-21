@@ -17,5 +17,5 @@ public readonly ref struct SpanHost<TInitial, TCurrent, TStreamNode>
 
     public TResult Execute<TResult, TProcessStream>(in TProcessStream finalNode, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TCurrent, TCurrent, TResult> =>
-        Node.Execute<TCurrent, TResult, TProcessStream>(Span, stackAllocationCount, finalNode);
+        Node.Execute<TCurrent, TResult, TProcessStream>(in finalNode, in Span, stackAllocationCount);
 }

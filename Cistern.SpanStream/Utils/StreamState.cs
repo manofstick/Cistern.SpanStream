@@ -7,7 +7,7 @@ internal static class LargeStackAllocator
 {
     internal interface IAfterAllocation<TInitial, TNext, TState>
     {
-        TResult Execute<TFinal, TResult, TProcessStream>(ref StreamState<TFinal> builder, in ReadOnlySpan<TInitial>  span, in TProcessStream stream, in TState state)
+        TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream stream, in ReadOnlySpan<TInitial> span, ref StreamState<TFinal> builder, in TState state)
             where TProcessStream : struct, IProcessStream<TNext, TFinal, TResult>;
     }
 
@@ -75,7 +75,7 @@ internal static class LargeStackAllocator
         var spanOfTCurrentArray = MemoryMarshal.CreateSpan(ref bufferStorage._01, BufferStorage<TCurrent>.NumberOfElements);
 
         StreamState<TCurrent> state = new(spanOfTCurrentArray, spanOfTCurrent);
-        return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(ref state, in span, in stream, in args);
+        return default(TExecution).Execute<TCurrent, TResult, TProcessStream>(in stream, in span, ref state, in args);
     }
 
     static TResult BuildStackObjectAndExecute<TInitial, TNext, TCurrent, TResult, TProcessStream, TArgs, TExecution, TCurrentChunk>(in ReadOnlySpan<TInitial>  span, in TProcessStream stream, in TArgs args, int requiredSize, int currentSize)

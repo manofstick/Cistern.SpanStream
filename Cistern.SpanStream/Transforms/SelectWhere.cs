@@ -20,8 +20,8 @@ public readonly struct SelectWhere<TInitial, TInput, TOutput, TPriorNode>
         return 0;
     }
 
-    TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitial> span, int? stackAllocationCount, in TProcessStream processStream) =>
-        Node.Execute<TFinal, TResult, SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(in span, stackAllocationCount, new(in processStream, Selector, Predicate));
+    TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
+        Node.Execute<TFinal, TResult, SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(new(in processStream, Selector, Predicate), in span, stackAllocationCount);
 }
 
 struct SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>

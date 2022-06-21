@@ -19,7 +19,7 @@ public readonly struct WhereRoot<TInitial>
     struct Execute
         : LargeStackAllocator.IAfterAllocation<TInitial, TInitial, Func<TInitial, bool>>
     {
-        public static TResult Invoke<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, in ReadOnlySpan<TInitial> span, in TProcessStream stream, Func<TInitial, bool> predicate)
+        public static TResult Invoke<TCurrent, TResult, TProcessStream>(in TProcessStream stream, in ReadOnlySpan<TInitial> span, ref StreamState<TCurrent> state, Func<TInitial, bool> predicate)
             where TProcessStream : struct, IProcessStream<TInitial, TCurrent, TResult>
         {
             var localCopy = stream;
@@ -27,28 +27,28 @@ public readonly struct WhereRoot<TInitial>
             return localCopy.GetResult(ref state);
         }
 
-        TResult LargeStackAllocator.IAfterAllocation<TInitial, TInitial, Func<TInitial, bool>>.Execute<TCurrent, TResult, TProcessStream>(ref StreamState<TCurrent> state, in ReadOnlySpan<TInitial> span, in TProcessStream stream, in Func<TInitial, bool> predicate) =>
-            Invoke<TCurrent, TResult, TProcessStream>(ref state, in span, in stream, predicate);
+        TResult LargeStackAllocator.IAfterAllocation<TInitial, TInitial, Func<TInitial, bool>>.Execute<TCurrent, TResult, TProcessStream>(in TProcessStream stream, in ReadOnlySpan<TInitial> span, ref StreamState<TCurrent> state, in Func<TInitial, bool> predicate) =>
+            Invoke<TCurrent, TResult, TProcessStream>(in stream, in span, ref state, predicate);
     }
 
-    TResult IStreamNode<TInitial, TInitial>.Execute<TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitial> span, int? stackAllocationCount, in TProcessStream processStream)
+    TResult IStreamNode<TInitial, TInitial>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
     {
         if (!stackAllocationCount.HasValue || stackAllocationCount <= 0)
-            return NoStack<TFinal, TResult, TProcessStream>(in span, in processStream);
+            return NoStack<TFinal, TResult, TProcessStream>(in processStream, in span);
         else if (stackAllocationCount <= 30)
-            return ExecuteSmallStack<TFinal, TResult, TProcessStream>(in span, in processStream);
+            return ExecuteSmallStack<TFinal, TResult, TProcessStream>(in processStream, in span);
         else
             return LargeStackAllocator.Execute<TInitial, TInitial, TFinal, TResult, TProcessStream, Func<TInitial, bool>, Execute>(stackAllocationCount.Value, in span, in processStream, Predicate);
     }
 
-    private TResult NoStack<TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitial> span, in TProcessStream processStream)
+    private TResult NoStack<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span)
         where TProcessStream : struct, IProcessStream<TInitial, TFinal, TResult>
     {
         StreamState<TFinal> state = default;
-        return Execute.Invoke<TFinal, TResult, TProcessStream>(ref state, in span, in processStream, Predicate);
+        return Execute.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state, Predicate);
     }
 
-    private TResult ExecuteSmallStack<TFinal, TResult, TProcessStream>(in ReadOnlySpan<TInitial> span, in TProcessStream processStream)
+    private TResult ExecuteSmallStack<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span)
         where TProcessStream : struct, IProcessStream<TInitial, TFinal, TResult>
     {
         LargeStackAllocator.BufferStorage<TFinal> chunkOfStackSpace = default;
@@ -58,6 +58,6 @@ public readonly struct WhereRoot<TInitial>
         var spanOfTCurrentArray = MemoryMarshal.CreateSpan(ref bufferStorage._01, LargeStackAllocator.BufferStorage<TFinal[]?>.NumberOfElements);
 
         StreamState<TFinal> state = new(spanOfTCurrentArray, spanOfTCurrent);
-        return Execute.Invoke<TFinal, TResult, TProcessStream>(ref state, in span, in processStream, Predicate);
+        return Execute.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state, Predicate);
     }
 }
