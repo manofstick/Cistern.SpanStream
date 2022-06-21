@@ -10,23 +10,23 @@ namespace Benchmarks;
 /*
 
 where-select-toarray
-|     Method |     N |         Mean |      Error |     StdDev |   Gen 0 |  Gen 1 | Allocated |
-|----------- |------ |-------------:|-----------:|-----------:|--------:|-------:|----------:|
-|     Manual |     0 |     25.30 ns |   0.199 ns |   0.186 ns |  0.0210 |      - |      88 B |
-| SpanStream |     0 |     58.97 ns |   0.360 ns |   0.337 ns |       - |      - |         - |
-|       Linq |     0 |     34.16 ns |   0.132 ns |   0.123 ns |       - |      - |         - |
-|     Manual |     1 |     29.93 ns |   0.166 ns |   0.155 ns |  0.0210 |      - |      88 B |
-| SpanStream |     1 |     85.29 ns |   0.071 ns |   0.059 ns |       - |      - |         - |
-|       Linq |     1 |     82.01 ns |   0.464 ns |   0.434 ns |  0.0248 |      - |     104 B |
-|     Manual |    10 |     58.55 ns |   0.297 ns |   0.278 ns |  0.0324 |      - |     136 B |
-| SpanStream |    10 |    161.19 ns |   0.880 ns |   0.823 ns |  0.0114 |      - |      48 B |
-|       Linq |    10 |    200.11 ns |   0.893 ns |   0.836 ns |  0.0591 |      - |     248 B |
-|     Manual |   100 |    368.88 ns |   1.923 ns |   1.799 ns |  0.2046 |      - |     856 B |
-| SpanStream |   100 |    982.76 ns |   4.660 ns |   3.638 ns |  0.0591 |      - |     248 B |
-|       Linq |   100 |  1,176.57 ns |   6.249 ns |   5.846 ns |  0.1907 |      - |     800 B |
-|     Manual | 10000 | 66,672.66 ns | 796.538 ns | 745.082 ns | 15.0146 | 7.4463 |  85,720 B |
-| SpanStream | 10000 | 87,662.42 ns | 399.659 ns | 373.841 ns |  3.5400 | 1.7090 |  19,920 B |
-|       Linq | 10000 | 91,712.54 ns | 437.863 ns | 388.155 ns |  9.0332 | 4.5166 |  53,392 B |
+|     Method |    N |        Mean |     Error |    StdDev |  Gen 0 |  Gen 1 | Allocated |
+|----------- |----- |------------:|----------:|----------:|-------:|-------:|----------:|
+|     Manual |    0 |    30.46 ns |  0.023 ns |  0.019 ns | 0.0210 |      - |      88 B |
+| SpanStream |    0 |    19.56 ns |  0.014 ns |  0.012 ns |      - |      - |         - |
+|       Linq |    0 |    34.44 ns |  0.170 ns |  0.159 ns |      - |      - |         - |
+|     Manual |    1 |    29.62 ns |  0.195 ns |  0.182 ns | 0.0210 |      - |      88 B |
+| SpanStream |    1 |    74.27 ns |  0.274 ns |  0.256 ns |      - |      - |         - |
+|       Linq |    1 |    66.98 ns |  0.245 ns |  0.191 ns | 0.0248 |      - |     104 B |
+|     Manual |   10 |    57.95 ns |  0.283 ns |  0.264 ns | 0.0324 |      - |     136 B |
+| SpanStream |   10 |   164.41 ns |  1.520 ns |  1.422 ns | 0.0114 |      - |      48 B |
+|       Linq |   10 |   188.30 ns |  1.456 ns |  1.362 ns | 0.0591 |      - |     248 B |
+|     Manual |  100 |   466.75 ns |  2.650 ns |  2.479 ns | 0.2041 |      - |     856 B |
+| SpanStream |  100 |   975.21 ns |  4.364 ns |  3.868 ns | 0.0591 |      - |     248 B |
+|       Linq |  100 | 1,181.97 ns |  5.353 ns |  4.745 ns | 0.1907 |      - |     800 B |
+|     Manual | 1000 | 5,941.74 ns | 36.168 ns | 33.831 ns | 1.5030 |      - |   6,304 B |
+| SpanStream | 1000 | 9,008.66 ns | 41.959 ns | 35.038 ns | 1.1902 | 0.0153 |   4,992 B |
+|       Linq | 1000 | 9,224.28 ns | 15.755 ns | 13.966 ns | 1.0834 | 0.0153 |   4,544 B |
 
 */
 
@@ -112,7 +112,7 @@ public class FirstTest
     }
 
     //[Params(0)]
-    [Params(0, 1, 10, 100, 1000)]
+    [Params(1, 10, 100, 1000)]
     public int N { get; set; }
 
     private ReadOnlyMemory<byte> data;
@@ -125,7 +125,9 @@ public class FirstTest
         new Random(42).NextBytes(_asArray);
         data = _asArray;
 
-        var tests = new Func<int[]>[]
+        _asArray[0] = 200;
+
+        var tests = new Func<int>[]
         {
             Manual,
             SpanStream,
@@ -152,12 +154,12 @@ public class FirstTest
     }
 
     [Benchmark]
-    public int[] Manual()
+    public int Manual()
     {
-        var x = ImmutableArray.CreateBuilder<int>();
+        //var x = ImmutableArray.CreateBuilder<int>();
         //var x = new int[data.Length];
         //var idx = 0;
-        //var accumulate = 0;
+        var accumulate = 0;
         foreach(var item in data.Span)
         {
             byte i = item ;
@@ -165,38 +167,38 @@ public class FirstTest
             {
                 if (i > 128)
                 {
-                    //accumulate += i;
+                    accumulate += i * 2;
                     //x[idx++] = (i * 2);
-                    x.Add(i * 2);
+//                    x.Add(i * 2);
                 }
             }
         }
-//        return accumulate;
-        return x.ToArray();
+        return accumulate;
+        //return x.ToArray();
     }
 
     [Benchmark]
-    public int[] SpanStream()
+    public int SpanStream()
     {
         return
             data.Span
 //            .Where(x => x < 250)
             .Where(x => x > 128)
                                     .Select(x => x * 2)
-                        .ToArray();
-            //.Aggregate(0, (a, c) => a + c);
+            //            .ToArray();
+            .Aggregate((a, c) => a + c);
     }
 
     [Benchmark]
-    public int[] Linq()
+    public int Linq()
     {
         return
             _asArray
             //            .Where(x => x < 250)
             .Where(x => x > 128)
                                     .Select(x => x * 2)
-                        .ToArray();
-            //.Aggregate(0, (a, c) => a + c);
+            //            .ToArray();
+            .Aggregate((a, c) => a + c);
     }
 }
 
@@ -204,6 +206,8 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        //Array.Empty<int>().Aggregate((a, c) => a + c);
+
         //var ttotal = 0;
         //for (var j = 0; j < 20; ++j)
         //{
