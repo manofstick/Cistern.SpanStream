@@ -129,7 +129,7 @@ public class FirstTest
 
         var tests = new Func<int>[]
         {
-            Manual,
+//            Manual,
             SpanStream,
             Linq
         };
@@ -153,7 +153,7 @@ public class FirstTest
             throw new Exception("Validation error");
     }
 
-    [Benchmark]
+    //[Benchmark]
     public int Manual()
     {
         //var x = ImmutableArray.CreateBuilder<int>();
@@ -177,16 +177,18 @@ public class FirstTest
         //return x.ToArray();
     }
 
-    [Benchmark]
+    [Benchmark(Baseline =true)]
     public int SpanStream()
     {
         return
             data.Span
 //            .Where(x => x < 250)
             .Where(x => x > 128)
+            .Append((byte)10)
                                     .Select(x => x * 2)
+                                    .Append(17)
             //            .ToArray();
-            .Aggregate(-59, (a, c) => a + c, r => -r);
+            .Aggregate(-59, (a, c) => (a * a) + c, r => -r);
     }
 
     [Benchmark]
@@ -196,9 +198,11 @@ public class FirstTest
             _asArray
             //            .Where(x => x < 250)
             .Where(x => x > 128)
+            .Append((byte)10)
                                     .Select(x => x * 2)
+                                    .Append(17)
             //            .ToArray();
-            .Aggregate(-59, (a, c) => a + c, r => -r);
+            .Aggregate(-59, (a, c) => (a*a) + c, r => -r);
     }
 }
 

@@ -27,7 +27,11 @@ namespace Cistern.SpanStream
         //- [ ] `bool All<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
         //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
         //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
-        //- [ ] `IEnumerable<TInitial> Append<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, TInitial element);`
+
+        public static SpanHost<TInitial, TCurrent, Append<TInitial, TCurrent, TNode>> Append<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, TCurrent item)
+            where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+            new(source.Span, new(in source.Node, item));
+
         //- [ ] `IEnumerable<TInitial> AsEnumerable<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
         //- [ ] `double Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int> selector);`
         //- [ ] `double Average<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, long> selector);`
