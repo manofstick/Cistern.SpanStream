@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Cistern.SpanStream.Roots;
 
 
-public readonly struct SelectRoot<TInput, TOutput>
+public /*readonly*/ struct SelectRoot<TInput, TOutput>
     : IStreamNode<TInput, TOutput>
 {
     public Func<TInput, TOutput> Selector { get; }

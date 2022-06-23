@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Cistern.SpanStream.Roots;
 
-public readonly struct Root<TInitial>
+public /*readonly*/ struct Root<TInitial>
     : IStreamNode<TInitial, TInitial>
 {
     int? IStreamNode<TInitial, TInitial>.TryGetSize(int sourceSize, out int upperBound)

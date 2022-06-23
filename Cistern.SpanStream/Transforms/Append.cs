@@ -3,11 +3,11 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
-public readonly struct Append<TInitial, TInput, TPriorNode>
+public /*readonly*/ struct Append<TInitial, TInput, TPriorNode>
     : IStreamNode<TInitial, TInput>
     where TPriorNode : struct, IStreamNode<TInitial, TInput>
 {
-    public readonly TPriorNode Node;
+    internal /*readonly*/ TPriorNode Node;
     public TInput Item { get; }
 
     public Append(in TPriorNode nodeT, TInput item) =>

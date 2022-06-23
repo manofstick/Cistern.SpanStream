@@ -3,11 +3,11 @@ using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
-public readonly struct Where<TInitial, TCurrent, TPriorNode>
+public /*readonly*/ struct Where<TInitial, TCurrent, TPriorNode>
     : IStreamNode<TInitial, TCurrent>
     where TPriorNode : struct, IStreamNode<TInitial, TCurrent>
 {
-    public readonly TPriorNode Node;
+    internal /*readonly*/ TPriorNode Node;
     public Func<TCurrent, bool> Predicate { get; }
 
     public Where(in TPriorNode nodeT, Func<TCurrent, bool> predicate) =>

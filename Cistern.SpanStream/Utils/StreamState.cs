@@ -101,8 +101,8 @@ internal static class LargeStackAllocator
 
 public ref struct StreamState<T>
 {
-    internal readonly Span<T[]?> Buffers;
-    internal readonly Span<T> Root;
+    internal /*readonly*/ Span<T[]?> Buffers;
+    internal /*readonly*/ Span<T> Root;
 
     internal Span<T> Current;
 

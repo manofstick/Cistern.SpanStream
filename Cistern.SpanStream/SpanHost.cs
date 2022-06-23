@@ -1,10 +1,10 @@
 ﻿namespace Cistern.SpanStream;
 
-public readonly ref struct SpanHost<TInitial, TCurrent, TStreamNode>
+public /*readonly*/ ref struct SpanHost<TInitial, TCurrent, TStreamNode>
     where TStreamNode : struct, IStreamNode<TInitial, TCurrent>
 {
-    public readonly ReadOnlySpan<TInitial> Span;
-    public readonly TStreamNode Node;
+    internal /*public readonly*/ ReadOnlySpan<TInitial> Span;
+    internal /*public readonly*/ TStreamNode Node;
 
     public SpanHost(in ReadOnlySpan<TInitial> span, in TStreamNode node)
     {

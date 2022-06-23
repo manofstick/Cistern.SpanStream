@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Cistern.SpanStream.Roots;
 
-public readonly struct WhereSelectRoot<TInput, TOutput>
+public /*readonly*/ struct WhereSelectRoot<TInput, TOutput>
     : IStreamNode<TInput, TOutput>
 {
     public Func<TInput, bool> Predicate { get; }
