@@ -12,12 +12,12 @@ public /*readonly*/ ref struct SpanHost<TInitial, TCurrent, TStreamNode>
         Node = node;
     }
 
-    public EnumeratorHost<TInitial, TCurrent, TStreamNode> GetEnumerator() => new(Span, Node);
+    public EnumeratorHost<TInitial, TCurrent, TStreamNode> GetEnumerator() => new(ref this);
 
     public int? TryGetSize(out int upperBound) =>
         Node.TryGetSize(Span.Length, out upperBound);
 
-    public TResult Execute<TResult, TProcessStream>(in TProcessStream finalNode, int? stackAllocationCount = null)
+    public TResult Execute<TResult, TProcessStream>(TProcessStream finalNode, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TCurrent, TCurrent, TResult> =>
         Node.Execute<TCurrent, TResult, TProcessStream>(in finalNode, in Span, stackAllocationCount);
 }
@@ -36,10 +36,10 @@ public ref struct EnumeratorHost<TInitial, TCurrent, TStreamNode>
     EnumeratorState<TInitial> _state;
     TCurrent _current;
 
-    public EnumeratorHost(in ReadOnlySpan<TInitial> span, in TStreamNode node)
+    internal EnumeratorHost(ref SpanHost<TInitial, TCurrent, TStreamNode> parent)
     {
-        _node = node;
-        _state = new() { Span = span };
+        _node = parent.Node;
+        _state = new() { Span = parent.Span };
         _current = default!;
     }
 
