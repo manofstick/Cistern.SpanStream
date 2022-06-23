@@ -3,6 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Cistern.SpanStream;
+using HonkPerf.NET.RefLinq;
 using System.Collections.Immutable;
 
 namespace Benchmarks;
@@ -131,6 +132,7 @@ public class FirstTest
         {
 //            Manual,
             SpanStream,
+            HonkPerf,
             Linq
         };
 
@@ -177,32 +179,51 @@ public class FirstTest
         //return x.ToArray();
     }
 
+    static readonly Func<byte, bool> AlwaysTrue = (byte b) => true;
+    static readonly Func<byte, bool> AlwaysFalse = (byte b) => false;
+    static readonly Func<byte, bool> FiftyFifty = (byte b) => b < 128;
+
+
+    static readonly Func<byte, bool> CurrentPredicate = FiftyFifty;
+
     [Benchmark(Baseline =true)]
     public int SpanStream()
     {
-        return
+        var x =
             data.Span
-            ////            .Where(x => x < 250)
-            //            .Where(x => x > 128)
-            //            .Append((byte)10)
-            //                                    .Select(x => x * 2)
-            //                                    .Append(17)
-            //            //            .ToArray();
-            .Aggregate(-59, (a, c) => (a * a) + c);//, r => -r);
+            .Where(CurrentPredicate);
+
+        var sum = 0;
+        foreach (var item in x)
+            sum += item;
+        return sum;
     }
 
     [Benchmark]
     public int Linq()
     {
-        return
+        var x =
             _asArray
-            ////            .Where(x => x < 250)
-            //.Where(x => x > 128)
-            //.Append((byte)10)
-            //                        .Select(x => x * 2)
-            //                        .Append(17)
-            ////            .ToArray();
-            .Aggregate(-59, (a, c) => (a * a) + c);//, r => -r);
+            .Where(CurrentPredicate);
+
+        var sum = 0;
+        foreach (var item in x)
+            sum += item;
+        return sum;
+    }
+
+    [Benchmark]
+    public int HonkPerf()
+    {
+        var x =
+            _asArray
+            .ToRefLinq()
+            .Where(CurrentPredicate);
+
+        var sum = 0;
+        foreach (var item in x)
+            sum += item;
+        return sum;
     }
 }
 
@@ -232,7 +253,7 @@ public class Program
         //Cistern.Utils.StackAllocator.Allocate<int>(100);
 
         var zz = new FirstTest();
-        zz.N = 1;
+        zz.N = 100;
         zz.GlobalSetup();
 
         //return;

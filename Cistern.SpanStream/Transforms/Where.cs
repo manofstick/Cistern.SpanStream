@@ -21,6 +21,17 @@ public /*readonly*/ struct Where<TInitial, TCurrent, TPriorNode>
 
     TResult IStreamNode<TInitial, TCurrent>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
         Node.Execute<TFinal, TResult, WhereStream<TCurrent, TFinal, TResult, TProcessStream>>(new(in processStream, Predicate), in span, stackAllocationCount);
+
+    public bool TryGetNext(ref EnumeratorState<TInitial> state, out TCurrent current)
+    {
+        while (Node.TryGetNext(ref state, out current))
+        {
+            if (Predicate(current))
+                return true;
+        }
+        current = default!;
+        return false;
+    }
 }
 
 struct WhereStream<TCurrent, TFinal, TResult, TProcessStream>

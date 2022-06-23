@@ -17,6 +17,17 @@ public /*readonly*/ struct Select<TInitial, TInput, TOutput, TPriorNode>
 
     TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
         Node.Execute<TFinal, TResult, SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(new(in processStream, Selector), in span, stackAllocationCount);
+
+    public bool TryGetNext(ref EnumeratorState<TInitial> state, out TOutput current)
+    {
+        if (Node.TryGetNext(ref state, out var item))
+        {
+            current = Selector(item);
+            return true;
+        }
+        current = default!;
+        return false;
+    }
 }
 
 struct SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>

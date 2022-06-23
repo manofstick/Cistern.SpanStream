@@ -68,4 +68,15 @@ public /*readonly*/ struct Root<TInitial>
         StreamState<TFinal> state = new(spanOfTCurrentArray, spanOfTCurrent);
         return Executer.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state);
     }
+
+    public bool TryGetNext(ref EnumeratorState<TInitial> state, out TInitial current)
+    {
+        if (state.Index < state.Span.Length)
+        {
+            current = state.Span[state.Index++];
+            return true;
+        }
+        current = default!;
+        return false;
+    }
 }

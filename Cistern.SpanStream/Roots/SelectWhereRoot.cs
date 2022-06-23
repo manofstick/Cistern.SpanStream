@@ -62,4 +62,16 @@ public /*readonly*/ struct SelectWhereRoot<TInput, TOutput>
         StreamState<TFinal> state = new(spanOfTCurrentArray, spanOfTCurrent);
         return Execute.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state, Selector, Predicate);
     }
+
+    public bool TryGetNext(ref EnumeratorState<TInput> state, out TOutput current)
+    {
+        while (state.Index < state.Span.Length)
+        {
+            current = Selector(state.Span[state.Index++]);
+            if (Predicate(current))
+                return true;
+        }
+        current = default!;
+        return false;
+    }
 }

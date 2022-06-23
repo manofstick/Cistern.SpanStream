@@ -22,6 +22,18 @@ public /*readonly*/ struct SelectWhere<TInitial, TInput, TOutput, TPriorNode>
 
     TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
         Node.Execute<TFinal, TResult, SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(new(in processStream, Selector, Predicate), in span, stackAllocationCount);
+
+    public bool TryGetNext(ref EnumeratorState<TInitial> state, out TOutput current)
+    {
+        while (Node.TryGetNext(ref state, out var item))
+        {
+            current = Selector(item);
+            if (Predicate(current))
+                return true;
+        }
+        current = default!;
+        return false;
+    }
 }
 
 struct SelectWhereStream<TInput, TOutput, TFinal, TResult, TProcessStream>

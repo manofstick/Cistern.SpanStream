@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotnet" Version="0.13.1" />
+    <PackageReference Include="HonkPerf.NET.RefLinq" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

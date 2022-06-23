@@ -60,4 +60,23 @@ public /*readonly*/ struct WhereRoot<TInitial>
         StreamState<TFinal> state = new(spanOfTCurrentArray, spanOfTCurrent);
         return Execute.Invoke<TFinal, TResult, TProcessStream>(in processStream, in span, ref state, Predicate);
     }
+
+    public bool TryGetNext(ref EnumeratorState<TInitial> state, out TInitial current)
+    {
+        var idx = state.Index;
+        var span = state.Span;
+        while (idx < span.Length)
+        {
+            var c = span[idx++];
+            if (Predicate(c))
+            {
+                state.Index = idx;
+                current = c;
+                return true;
+            }
+        }
+        state.Index = idx;
+        current = default!;
+        return false;
+    }
 }

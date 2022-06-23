@@ -10,8 +10,10 @@ public /*readonly*/ struct Append<TInitial, TInput, TPriorNode>
     internal /*readonly*/ TPriorNode Node;
     public TInput Item { get; }
 
+    private bool _appended;
+
     public Append(in TPriorNode nodeT, TInput item) =>
-        (Node, Item) = (nodeT, item);
+        (Node, Item, _appended) = (nodeT, item, false);
 
     int? IStreamNode<TInitial, TInput>.TryGetSize(int sourceSize, out int upperBound)
     {
@@ -22,6 +24,22 @@ public /*readonly*/ struct Append<TInitial, TInput, TPriorNode>
 
     TResult IStreamNode<TInitial, TInput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
         Node.Execute<TFinal, TResult, AppendStream<TInput, TFinal, TResult, TProcessStream>>(new(in processStream, Item), in span, stackAllocationCount);
+
+    public bool TryGetNext(ref EnumeratorState<TInitial> state, out TInput current)
+    {
+        if (Node.TryGetNext(ref state, out current))
+            return true;
+
+        if (!_appended)
+        {
+            current = Item;
+            _appended = true;
+            return true;
+        }
+
+        current = default!;
+        return false;
+    }
 }
 
 struct AppendStream<TInput, TFinal, TResult, TProcessStream>
