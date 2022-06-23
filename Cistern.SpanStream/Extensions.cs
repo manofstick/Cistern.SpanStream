@@ -36,6 +36,8 @@ namespace Cistern.SpanStream
         //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source);`
         //- [ ] `bool Any<TInitial>(this in SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
 
+        public static SpanHost<TInitial, TInitial, Append<TInitial, TInitial, Root<TInitial>>> Append<TInitial>(this in ReadOnlySpan<TInitial> source, TInitial item) =>
+            new(source, new(new(), item));
         public static SpanHost<TInitial, TCurrent, Append<TInitial, TCurrent, TNode>> Append<TInitial, TCurrent, TNode>(this in SpanHost<TInitial, TCurrent, TNode> source, TCurrent item)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
             new(source.Span, new(in source.Node, item));
