@@ -78,7 +78,8 @@ public class FirstTest
     }
 
     //[Params(0)]
-    [Params(1, 10, 100, 1000)]
+    //[Params(1, 10, 100, 1000)]
+    [Params(1)]
     public int N { get; set; }
 
     private ReadOnlyMemory<int> data;

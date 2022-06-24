@@ -12,7 +12,7 @@ public /*readonly*/ struct Append<TInitial, TInput, TPriorNode>
 
     private bool _appended;
 
-    public Append(in TPriorNode nodeT, TInput item) =>
+    public Append(ref TPriorNode nodeT, TInput item) =>
         (Node, Item, _appended) = (nodeT, item, false);
 
     int? IStreamNode<TInitial, TInput>.TryGetSize(int sourceSize, out int upperBound)

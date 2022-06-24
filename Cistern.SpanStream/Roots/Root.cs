@@ -6,6 +6,8 @@ namespace Cistern.SpanStream.Roots;
 public /*readonly*/ struct Root<TInitial>
     : IStreamNode<TInitial, TInitial>
 {
+    internal static Root<TInitial> Instance = new ();
+
     int? IStreamNode<TInitial, TInitial>.TryGetSize(int sourceSize, out int upperBound)
     {
         upperBound = sourceSize;

@@ -10,7 +10,7 @@ public /*readonly*/ struct Select<TInitial, TInput, TOutput, TPriorNode>
     internal /*readonly*/ TPriorNode Node;
     public Func<TInput, TOutput> Selector { get; }
 
-    public Select(in TPriorNode nodeT, Func<TInput, TOutput> selector) =>
+    public Select(ref TPriorNode nodeT, Func<TInput, TOutput> selector) =>
         (Node, Selector) = (nodeT, selector);
 
     int? IStreamNode<TInitial, TOutput>.TryGetSize(int sourceSize, out int upperBound) => Node.TryGetSize(sourceSize, out upperBound);

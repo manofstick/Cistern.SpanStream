@@ -11,7 +11,7 @@ public /*readonly*/ struct SelectWhere<TInitial, TInput, TOutput, TPriorNode>
     private Func<TInput, TOutput> Selector { get; }
     private Func<TOutput, bool> Predicate { get; }
 
-    public SelectWhere(in TPriorNode nodeT, Func<TInput, TOutput> selector, Func<TOutput, bool> predicate) =>
+    public SelectWhere(ref TPriorNode nodeT, Func<TInput, TOutput> selector, Func<TOutput, bool> predicate) =>
         (Node, Selector, Predicate) = (nodeT, selector, predicate);
 
     int? IStreamNode<TInitial, TOutput>.TryGetSize(int sourceSize, out int upperBound)

@@ -10,7 +10,7 @@ public /*readonly*/ struct Where<TInitial, TCurrent, TPriorNode>
     internal /*readonly*/ TPriorNode Node;
     public Func<TCurrent, bool> Predicate { get; }
 
-    public Where(in TPriorNode nodeT, Func<TCurrent, bool> predicate) =>
+    public Where(ref TPriorNode nodeT, Func<TCurrent, bool> predicate) =>
         (Node, Predicate) = (nodeT, predicate);
 
     int? IStreamNode<TInitial, TCurrent>.TryGetSize(int sourceSize, out int upperBound)

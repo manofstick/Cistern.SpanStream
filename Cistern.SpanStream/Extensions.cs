@@ -37,10 +37,10 @@ namespace Cistern.SpanStream
         //- [ ] `bool Any<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
 
         public static SpanHost<TInitial, TInitial, Append<TInitial, TInitial, Root<TInitial>>> Append<TInitial>(this ReadOnlySpan<TInitial> source, TInitial item) =>
-            new(source, new(new(), item));
+            new(source, new(ref Root<TInitial>.Instance, item));
         public static SpanHost<TInitial, TCurrent, Append<TInitial, TCurrent, TNode>> Append<TInitial, TCurrent, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, TCurrent item)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
-            new(source.Span, new(in source.Node, item));
+            new(in source.Span, new(ref source.Node, item));
 
         //- [ ] `IEnumerable<TInitial> AsEnumerable<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source);`
         //- [ ] `double Average<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int> selector);`
@@ -178,15 +178,15 @@ namespace Cistern.SpanStream
         public static SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> Select<TInitial, TCurrent>(this ReadOnlySpan<TInitial> span, Func<TInitial, TCurrent> selector) =>
             new(span, new(selector));
         public static SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> Select<TInitial, TCurrent>(this SpanHost<TInitial, TInitial, Root<TInitial>> source, Func<TInitial, TCurrent> selector) =>
-            new(source.Span, new(selector));
+            new(in source.Span, new(selector));
         public static SpanHost<TCurrent, TNext, WhereSelectRoot<TCurrent, TNext>> Select<TCurrent, TNext>(this SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>> source, Func<TCurrent, TNext> selector) =>
-            new(source.Span, new(source.Node.Predicate, selector));
+            new(in source.Span, new(source.Node.Predicate, selector));
         public static SpanHost<TInitial, TNext, WhereSelect<TInitial, TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this SpanHost<TInitial, TCurrent, Where<TInitial, TCurrent, TNode>> source, Func<TCurrent, TNext> selector)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
-            new(source.Span, new(in source.Node.Node, source.Node.Predicate, selector));
+            new(in source.Span, new(ref source.Node.Node, source.Node.Predicate, selector));
         public static SpanHost<TInitial, TNext, Select<TInitial, TCurrent, TNext, TNode>> Select<TInitial, TCurrent, TNext, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TNext> selector)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
-            new(source.Span, new(in source.Node, selector));
+            new(in source.Span, new(ref source.Node, selector));
 
         //- [ ] `IEnumerable<TResult> Select<TInitial, TResult>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, TResult> selector);`
 
@@ -255,7 +255,7 @@ namespace Cistern.SpanStream
             => source.ToArray(stackElementCount, useSharedPool ? ArrayPool<TCurrent>.Shared : null);
 
         public static TCurrent[] ToArray<TInitial, TCurrent>(this SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source)
-            => Iterator.SelectToArray(source.Span, source.Node.Selector);
+            => Iterator.SelectToArray(in source.Span, source.Node.Selector);
 
         //- [ ] `Dictionary<TKey, TInitial> ToDictionary<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector) where TKey : notnull;`
         //- [ ] `Dictionary<TKey, TInitial> ToDictionary<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
@@ -275,17 +275,17 @@ namespace Cistern.SpanStream
         //- [ ] `IEnumerable<TInitial> UnionBy<TInitial, TKey>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second, Func<TInitial, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
 
         public static SpanHost<TInitial, TInitial, WhereRoot<TInitial>> Where<TInitial>(this ReadOnlySpan<TInitial> span, Func<TInitial, bool> predicate) =>
-            new(span, new(predicate));
+            new(in span, new(predicate));
         public static SpanHost<TInitial, TInitial, WhereRoot<TInitial>> Where<TInitial>(this SpanHost<TInitial, TInitial, Root<TInitial>> source, Func<TInitial, bool> predicate) =>
-            new(source.Span, new(predicate));
+            new(in source.Span, new(predicate));
         public static SpanHost<TInitial, TCurrent, SelectWhereRoot<TInitial, TCurrent>> Where<TInitial, TCurrent>(this SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> source, Func<TCurrent, bool> predicate) =>
-            new(source.Span, new(source.Node.Selector, predicate));
+            new(in source.Span, new(source.Node.Selector, predicate));
         public static SpanHost<TInitial, TNext, SelectWhere<TInitial, TCurrent, TNext, TNode>> Where<TInitial, TCurrent, TNext, TNode>(this SpanHost<TInitial, TNext, Select<TInitial, TCurrent, TNext, TNode>> source, Func<TNext, bool> predicate)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
-            new(source.Span, new(in source.Node.Node, source.Node.Selector, predicate));
+            new(in source.Span, new(ref source.Node.Node, source.Node.Selector, predicate));
         public static SpanHost<TInitial, TCurrent, Where<TInitial, TCurrent, TNode>> Where<TInitial, TCurrent, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, bool> predicate)
             where TNode : struct, IStreamNode<TInitial, TCurrent> =>
-            new(source.Span, new(in source.Node, predicate));
+            new(in source.Span, new(ref source.Node, predicate));
 
         //- [ ] `IEnumerable<TInitial> Where<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, bool> predicate);`
         //- [ ] `IEnumerable<(TFirst First, TSecond Second, TThird Third)> Zip<TFirst, TSecond, TThird>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third);`
