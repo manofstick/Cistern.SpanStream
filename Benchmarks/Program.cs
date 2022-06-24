@@ -77,9 +77,10 @@ public class FirstTest
         }
     }
 
-    //[Params(0)]
+#if LONG
     //[Params(1, 10, 100, 1000)]
-    [Params(1)]
+#endif
+    [Params(100)]
     public int N { get; set; }
 
     private ReadOnlyMemory<int> data;
@@ -96,15 +97,10 @@ public class FirstTest
             .ToArray();
         data = _asArray;
 
-        var tests = new Func<int>[]
+        var tests = new Func<int[]>[]
         {
-//            Manual,
             SpanStream,
-            HonkPerf,
             Linq,
-            SpanStream_Sum,
-            HonkPerf_Sum,
-            Linq_Sum,
         };
 
         var baseline = tests[0]();
@@ -126,137 +122,30 @@ public class FirstTest
             throw new Exception("Validation error");
     }
 
-    //[Benchmark]
-    public int Manual()
-    {
-        //var x = ImmutableArray.CreateBuilder<int>();
-        //var x = new int[data.Length];
-        //var idx = 0;
-        var accumulate = -59;
-        foreach(var item in data.Span)
-        {
-            var i = item;
-            //if (i < 250)
-            {
-                if (i > 128)
-                {
-                    accumulate += i * 2;
-                    //x[idx++] = (i * 2);
-//                    x.Add(i * 2);
-                }
-            }
-        }
-        return -accumulate;
-        //return x.ToArray();
-    }
-
     static readonly Func<int, bool> AlwaysTrue = (int b) => true;
     static readonly Func<int, bool> AlwaysFalse = (int b) => false;
     static readonly Func<int, bool> FiftyFifty = (int b) => b % 2 == 0;
 
-
     static readonly Func<int, bool> CurrentPredicate = FiftyFifty;
 
     [Benchmark]
-    public int SpanStream()
-    {
-        var x =
-            data.Span
-            .Append(42)
-            .Where(CurrentPredicate)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
-            ;
-
-        var sum = 0;
-        foreach (var item in x)
-            sum += item;
-        return sum;
-    }
-
-    [Benchmark(Baseline = true)]
-    public int SpanStream_Sum()
+    public int[] SpanStream()
     {
         return
             data.Span
-            .Append(42)
-            .Where(FiftyFifty)
-            .Append(42)
             .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
-            .Aggregate(0, (a, c) => a+c);
-    }
-
-
-    [Benchmark]
-    public int Linq()
-    {
-        var x =
-            _asArray
-            .Append(42)
-            .Where(CurrentPredicate)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
-            ;
-
-        var sum = 0;
-        foreach (var item in x)
-            sum += item;
-        return sum;
+            .Where(x => x < 100)
+            .ToArray();
     }
 
     [Benchmark]
-    public int Linq_Sum()
+    public int[] Linq()
     {
         return
             _asArray
-            .Append(42)
-            .Where(CurrentPredicate)
-            .Append(42)
             .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
-            .Aggregate(0, (a, c) => a + c);
-    }
-
-    [Benchmark]
-    public int HonkPerf()
-    {
-        var x =
-            _asArray
-            .ToRefLinq()
-            .Append(42)
-            .Where(CurrentPredicate)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
-            ;
-
-        var sum = 0;
-        foreach (var item in x)
-            sum += item;
-        return sum;
-    }
-
-    [Benchmark]
-    public int HonkPerf_Sum()
-    {
-        return
-            _asArray
-            .ToRefLinq()
-            .Append(42)
-            .Where(CurrentPredicate)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
-            .Aggregate(0, (a, c) => a + c);
+            .Where(x => x < 100)
+            .ToArray();
     }
 }
 

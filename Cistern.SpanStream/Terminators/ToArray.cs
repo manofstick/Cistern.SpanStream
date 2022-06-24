@@ -139,6 +139,26 @@ public struct ToArray<T>
         _builder.GetNextCell(ref state) = input;
         return true;
     }
+
+    public static T[] Execute<TInitial, TNode>(in ReadOnlySpan<TInitial> span, ref TNode source, int stackElementCount, ArrayPool<T>? maybeArrayPool)
+        where TNode : struct, IStreamNode<TInitial, T>
+    {
+        var maybeSize = source.TryGetSize(span.Length, out var upperBound);
+
+        if (upperBound == 0)
+            return Array.Empty<T>();
+
+        if (maybeSize.HasValue)
+        {
+            ToArrayKnownSize<T> toArray = new(new T[maybeSize.Value]);
+            return source.Execute<T, T[], ToArrayKnownSize<T>>(toArray, span, null);
+        }
+        else
+        {
+            ToArray<T> toArray = new(upperBound, maybeArrayPool);
+            return source.Execute<T, T[], ToArray<T>>(toArray, span, Math.Min(upperBound, stackElementCount));
+        }
+    }
 }
 
 public struct ToArrayKnownSize<T>

@@ -238,17 +238,7 @@ namespace Cistern.SpanStream
 
         public static TCurrent[] ToArray<TInitial, TCurrent, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, int stackElementCount, ArrayPool<TCurrent>? maybeArrayPool)
             where TNode : struct, IStreamNode<TInitial, TCurrent>
-        {
-            var maybeSize = source.TryGetSize(out var upperBound);
-
-            if (upperBound == 0)
-                return Array.Empty<TCurrent>();
-
-            if (maybeSize.HasValue)
-                return source.Execute<TCurrent[], ToArrayKnownSize<TCurrent>>(new(new TCurrent[maybeSize.Value]));
-
-            return source.Execute<TCurrent[], ToArray<TCurrent>>(new(upperBound, maybeArrayPool), Math.Min(upperBound, stackElementCount));
-        }
+            => ToArray<TCurrent>.Execute(in source.Span, ref source.Node, stackElementCount, maybeArrayPool);
 
         public static TCurrent[] ToArray<TInitial, TCurrent, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, int stackElementCount = 100, bool useSharedPool = false)
             where TNode : struct, IStreamNode<TInitial, TCurrent>
