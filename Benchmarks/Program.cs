@@ -97,7 +97,7 @@ public class FirstTest
             .ToArray();
         data = _asArray;
 
-        var tests = new Func<int[]>[]
+        var tests = new Func<int?>[]
         {
             SpanStream,
             Linq,
@@ -122,6 +122,12 @@ public class FirstTest
             throw new Exception("Validation error");
     }
 
+    private static void Validate(int? baseline, int? check)
+    {
+        if (!Nullable.Equals(baseline, check))
+            throw new Exception("Validation error");
+    }
+
     static readonly Func<int, bool> AlwaysTrue = (int b) => true;
     static readonly Func<int, bool> AlwaysFalse = (int b) => false;
     static readonly Func<int, bool> FiftyFifty = (int b) => b % 2 == 0;
@@ -129,23 +135,23 @@ public class FirstTest
     static readonly Func<int, bool> CurrentPredicate = FiftyFifty;
 
     [Benchmark]
-    public int[] SpanStream()
+    public int? SpanStream()
     {
         return
             data.Span
-            .Select(x => x * 2)
+            .Select(x => (int?)(x * 2))
             .Where(x => x < 100)
-            .ToArray();
+            .Sum();
     }
 
     [Benchmark]
-    public int[] Linq()
+    public int? Linq()
     {
         return
             _asArray
-            .Select(x => x * 2)
+            .Select(x => (int?)(x * 2))
             .Where(x => x < 100)
-            .ToArray();
+            .Sum();
     }
 }
 

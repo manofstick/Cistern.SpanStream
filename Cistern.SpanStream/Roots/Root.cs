@@ -31,7 +31,7 @@ public /*readonly*/ struct Root<TInitial>
             => Invoke<TFinal, TResult, TProcessStream>(in stream, in span, ref state);
     }
 
-    public static TResult Execute<TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+    public static TResult Execute<TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TInitial, TInitial, TResult>
     {
         return Invoke(new Root<TInitial>(), in processStream, in span, stackAllocationCount);
