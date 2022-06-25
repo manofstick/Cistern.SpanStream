@@ -185,7 +185,9 @@ public static class Extensions
     //- [ ] `IEnumerable<TInitial> Prepend<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, TInitial element);`
     //- [ ] `IEnumerable<int> Range(int start, int count);`
     //- [ ] `IEnumerable<TResult> Repeat<TResult>(TResult element, int count);`
-    //- [ ] `IEnumerable<TInitial> Reverse<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source);`
+
+    public static SpanHost<TInitial, TInitial, RootReverse<TInitial>> Reverse<TInitial>(this ReadOnlySpan<TInitial> source)
+        => new(source, new());
 
     public static SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> Select<TInitial, TCurrent>(this ReadOnlySpan<TInitial> span, Func<TInitial, TCurrent> selector) =>
         new(span, new(selector));

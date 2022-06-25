@@ -97,10 +97,13 @@ public class FirstTest
             .ToArray();
         data = _asArray;
 
-        var tests = new Func<int?>[]
+        var tests = new Func<int>[]
         {
+            Manual,
             SpanStream,
+            SpanStream_Enumerator,
             Linq,
+            Linq_Enumerator,
         };
 
         var baseline = tests[0]();
@@ -135,23 +138,56 @@ public class FirstTest
     static readonly Func<int, bool> CurrentPredicate = FiftyFifty;
 
     [Benchmark]
-    public int? SpanStream()
+    public int Manual()
     {
-        return
-            data.Span
-            .Select(x => (int?)(x * 2))
-            .Where(x => x < 100)
-            .Sum();
+        var sum = 0;
+        for(var i= _asArray.Length-1; i >= 0; --i)
+            sum = (sum * sum) + _asArray[i];
+        return sum;
     }
 
     [Benchmark]
-    public int? Linq()
+    public int SpanStream()
+    {
+        return
+            data.Span
+            .Reverse()
+            .Aggregate((a, c) => (a * a) + c);
+    }
+
+    [Benchmark]
+    public int SpanStream_Enumerator()
+    {
+        var x =
+            data.Span
+            .Reverse();
+
+        var sum = 0;
+        foreach (var item in x)
+            sum = (sum * sum) + item;
+        return sum;
+    }
+
+    [Benchmark]
+    public int Linq()
     {
         return
             _asArray
-            .Select(x => (int?)(x * 2))
-            .Where(x => x < 100)
-            .Sum();
+            .Reverse()
+            .Aggregate((a, c) => (a * a) + c);
+    }
+
+    [Benchmark]
+    public int Linq_Enumerator()
+    {
+        var x =
+            _asArray
+            .Reverse();
+
+        var sum = 0;
+        foreach (var item in x)
+            sum = (sum * sum) + item;
+        return sum;
     }
 }
 

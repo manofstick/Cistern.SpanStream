@@ -3,10 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace Cistern.SpanStream.Roots;
 
-public /*readonly*/ struct Root<TInitial>
+public /*readonly*/ struct RootReverse<TInitial>
     : IStreamNode<TInitial, TInitial>
 {
-    internal static Root<TInitial> Instance = new ();
+    internal static RootReverse<TInitial> Instance = new();
 
     int? IStreamNode<TInitial, TInitial>.TryGetSize(int sourceSize, out int upperBound)
     {
@@ -23,7 +23,7 @@ public /*readonly*/ struct Root<TInitial>
             where TProcessStream : struct, IProcessStream<TInitial, TFinal, TResult>
         {
             var localCopy = stream;
-            Iterator.Forward(ref state, in span, ref localCopy);
+            Iterator.Reverse(ref state, in span, ref localCopy);
             return localCopy.GetResult(ref state);
         }
 
@@ -34,7 +34,7 @@ public /*readonly*/ struct Root<TInitial>
     public static TResult Execute<TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TInitial, TInitial, TResult>
     {
-        return Invoke(ref Root<TInitial>.Instance, in processStream, in span, stackAllocationCount);
+        return Invoke(ref RootReverse<TInitial>.Instance, in processStream, in span, stackAllocationCount);
 
         static TResult Invoke<TRootInitial>(ref TRootInitial root, in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
             where TRootInitial : IStreamNode<TInitial, TInitial> =>
@@ -73,9 +73,12 @@ public /*readonly*/ struct Root<TInitial>
 
     public bool TryGetNext(ref EnumeratorState<TInitial> state, out TInitial current)
     {
-        if (state.Index < state.Span.Length)
+        var stateIdx = state.Index;
+        var idx = state.Span.Length - stateIdx - 1;
+        if (idx >= 0)
         {
-            current = state.Span[state.Index++];
+            state.Index = stateIdx + 1;
+            current = state.Span[idx];
             return true;
         }
         current = default!;
