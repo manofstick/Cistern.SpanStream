@@ -31,10 +31,16 @@ public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
     public TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
         where TProcessStream : struct, IProcessStream<TInput, TFinal, TResult>
     {
-        throw new NotImplementedException();
-        //var reversedArray = CreateReversedArray(span);
-        //var spanHost = new SpanHost<TInput, TInput, Root<TInput>>(reversedArray.ToReadOnlySpan(), new());
-        //return spanHost.Execute<TResult, TProcessStream>(processStream);
+        var _ = Node.TryGetSize(span.Length, out var upperBound);
+        if (upperBound <= _stackElementCount)
+        {
+            return Node.Execute<TInput, TResult, ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream>>(new(in processStream, upperBound), span, upperBound);
+        }
+        else
+        {
+            var reversedArray = CreateReversedArray(span);
+            return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(processStream, reversedArray.ToReadOnlySpan(), 0);
+        }
     }
 
     public bool TryGetNext(ref EnumeratorState<TInitial> state, out TInput current)
@@ -66,5 +72,25 @@ public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
         var reversed = ToArray<TInput>.Execute(span, ref Node, _stackElementCount, _maybeArrayPool);
         Array.Reverse(reversed);
         return reversed;
+    }
+}
+
+public struct ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream>
+    : IProcessStream<TInput, TInput, TResult>
+        where TProcessStream : struct, IProcessStream<TInput, TFinal, TResult>
+{
+    TProcessStream _processStream;
+    int _index;
+    int _size;
+
+    public ReverseOnStreamState(in TProcessStream processStream, int size) => (_processStream, _size, _index) = (processStream, size, size);
+
+    public TResult GetResult(ref StreamState<TInput> builder) =>
+        Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(_processStream, builder.Current.Slice(_index, _size-_index), 0);
+
+    public bool ProcessNext(ref StreamState<TInput> builder, in TInput input)
+    {
+        builder.Current[--_index] = input;
+        return true;
     }
 }

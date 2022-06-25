@@ -100,7 +100,7 @@ public class FirstTest
         var tests = new Func<int>[]
         {
             Manual,
-            //SpanStream,
+            SpanStream,
             SpanStream_Enumerator,
             Linq,
             Linq_Enumerator,
@@ -146,7 +146,7 @@ public class FirstTest
         return sum;
     }
 
-    //[Benchmark]
+    [Benchmark]
     public int SpanStream()
     {
         return

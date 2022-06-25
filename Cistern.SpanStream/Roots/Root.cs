@@ -41,7 +41,8 @@ public /*readonly*/ struct Root<TInitial>
             root.Execute<TInitial, TResult, TProcessStream>(in processStream, in span, stackAllocationCount);
     }
 
-    TResult IStreamNode<TInitial, TInitial>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+    public TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+        where TProcessStream : struct, IProcessStream<TInitial, TFinal, TResult>
     {
         if (!stackAllocationCount.HasValue || stackAllocationCount <= 0)
             return NoStack<TFinal, TResult, TProcessStream>(in processStream, in span);
