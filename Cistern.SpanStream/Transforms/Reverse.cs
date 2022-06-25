@@ -2,7 +2,6 @@
 using Cistern.SpanStream.Terminators;
 using Cistern.Utils;
 using System.Buffers;
-using System.Runtime.CompilerServices;
 
 namespace Cistern.SpanStream.Transforms;
 
@@ -81,12 +80,13 @@ public struct ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream>
 {
     TProcessStream _processStream;
     int _index;
-    int _size;
+    readonly int _size;
 
-    public ReverseOnStreamState(in TProcessStream processStream, int size) => (_processStream, _size, _index) = (processStream, size, size);
+    public ReverseOnStreamState(in TProcessStream processStream, int size) =>
+        (_processStream, _size, _index) = (processStream, size, size);
 
     public TResult GetResult(ref StreamState<TInput> builder) =>
-        Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(_processStream, builder.Current.Slice(_index, _size-_index), 0);
+        Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(_processStream, builder.Current[_index.._size], 0);
 
     public bool ProcessNext(ref StreamState<TInput> builder, in TInput input)
     {

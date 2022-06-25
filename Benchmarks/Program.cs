@@ -141,7 +141,8 @@ public class FirstTest
     public int Manual()
     {
         var sum = 0;
-        for(var i= _asArray.Length-1; i >= 0; --i)
+        //for(var i= _asArray.Length-1; i >= 0; --i)
+        for (var i = 0; i < _asArray.Length; ++i)
             sum = (sum * sum) + _asArray[i];
         return sum;
     }
@@ -153,6 +154,7 @@ public class FirstTest
             data.Span
             .Select(x => x)
             .Reverse()
+            .Reverse()
             .Aggregate((a, c) => (a * a) + c);
     }
 
@@ -162,6 +164,7 @@ public class FirstTest
         var x =
             data.Span
             .Select(x => x)
+            .Reverse()
             .Reverse();
 
         var sum = 0;
@@ -177,6 +180,7 @@ public class FirstTest
             _asArray
             .Select(x => x)
             .Reverse()
+            .Reverse()
             .Aggregate((a, c) => (a * a) + c);
     }
 
@@ -186,6 +190,7 @@ public class FirstTest
         var x =
             _asArray
             .Select(x => x)
+            .Reverse()
             .Reverse();
 
         var sum = 0;

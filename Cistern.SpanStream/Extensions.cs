@@ -191,7 +191,9 @@ public static class Extensions
     public static SpanHost<TInitial, TCurrent, Reverse<TInitial, TCurrent, TNode>> Reverse<TInitial, TCurrent, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
         where TNode : struct, IStreamNode<TInitial, TCurrent> =>
         new(in source.Span, new(ref source.Node, stackElementCount, maybeArrayPool));
-
+    public static SpanHost<TInitial, TCurrent, TNode> Reverse<TInitial, TCurrent, TNode>(this SpanHost<TInitial, TCurrent, Reverse<TInitial, TCurrent, TNode>> source)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+        new(in source.Span, in source.Node.Node);
 
     public static SpanHost<TInitial, TCurrent, SelectRoot<TInitial, TCurrent>> Select<TInitial, TCurrent>(this ReadOnlySpan<TInitial> span, Func<TInitial, TCurrent> selector) =>
         new(span, new(selector));
