@@ -100,7 +100,7 @@ public class FirstTest
         var tests = new Func<int>[]
         {
             Manual,
-            SpanStream,
+            //SpanStream,
             SpanStream_Enumerator,
             Linq,
             Linq_Enumerator,
@@ -146,11 +146,12 @@ public class FirstTest
         return sum;
     }
 
-    [Benchmark]
+    //[Benchmark]
     public int SpanStream()
     {
         return
             data.Span
+            .Select(x => x)
             .Reverse()
             .Aggregate((a, c) => (a * a) + c);
     }
@@ -160,6 +161,7 @@ public class FirstTest
     {
         var x =
             data.Span
+            .Select(x => x)
             .Reverse();
 
         var sum = 0;
@@ -173,6 +175,7 @@ public class FirstTest
     {
         return
             _asArray
+            .Select(x => x)
             .Reverse()
             .Aggregate((a, c) => (a * a) + c);
     }
@@ -182,6 +185,7 @@ public class FirstTest
     {
         var x =
             _asArray
+            .Select(x => x)
             .Reverse();
 
         var sum = 0;

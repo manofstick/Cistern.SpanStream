@@ -140,7 +140,7 @@ public struct ToArray<T>
         return true;
     }
 
-    public static T[] Execute<TInitial, TNode>(in ReadOnlySpan<TInitial> span, ref TNode source, int stackElementCount, ArrayPool<T>? maybeArrayPool)
+    public static T[] Execute<TInitial, TNode>(in ReadOnlySpan<TInitial> span, ref TNode source, int? stackElementCount, ArrayPool<T>? maybeArrayPool)
         where TNode : struct, IStreamNode<TInitial, T>
     {
         var maybeSize = source.TryGetSize(span.Length, out var upperBound);
@@ -156,7 +156,7 @@ public struct ToArray<T>
         else
         {
             ToArray<T> toArray = new(upperBound, maybeArrayPool);
-            return source.Execute<T, T[], ToArray<T>>(toArray, span, Math.Min(upperBound, stackElementCount));
+            return source.Execute<T, T[], ToArray<T>>(toArray, span, Math.Min(upperBound, stackElementCount??0));
         }
     }
 }
