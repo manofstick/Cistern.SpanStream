@@ -1,7 +1,7 @@
 ﻿using Cistern.Utils;
 using System.Runtime.CompilerServices;
 
-namespace Cistern.SpanStream.Transforms;
+namespace Cistern.Spanner.Transforms;
 
 public /*readonly*/ struct Where<TInitial, TCurrent, TPriorNode>
     : IStreamNode<TInitial, TCurrent>

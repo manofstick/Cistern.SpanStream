@@ -1,6 +1,6 @@
 ﻿using Cistern.Utils;
 
-namespace Cistern.SpanStream;
+namespace Cistern.Spanner;
 
 public interface IProcessStream<TElement, TFinal>
 {

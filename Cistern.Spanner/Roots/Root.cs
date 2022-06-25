@@ -1,12 +1,12 @@
 ﻿using Cistern.Utils;
 using System.Runtime.InteropServices;
 
-namespace Cistern.SpanStream.Roots;
+namespace Cistern.Spanner.Roots;
 
-public /*readonly*/ struct RootReverse<TInitial>
+public /*readonly*/ struct Root<TInitial>
     : IStreamNode<TInitial, TInitial>
 {
-    internal static RootReverse<TInitial> Instance = new();
+    internal static Root<TInitial> Instance = new ();
 
     int? IStreamNode<TInitial, TInitial>.TryGetSize(int sourceSize, out int upperBound)
     {
@@ -23,7 +23,7 @@ public /*readonly*/ struct RootReverse<TInitial>
             where TProcessStream : struct, IProcessStream<TInitial, TFinal, TResult>
         {
             var localCopy = stream;
-            Iterator.Reverse(ref state, in span, ref localCopy);
+            Iterator.Forward(ref state, in span, ref localCopy);
             return localCopy.GetResult(ref state);
         }
 
@@ -34,14 +34,15 @@ public /*readonly*/ struct RootReverse<TInitial>
     public static TResult Execute<TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TInitial, TInitial, TResult>
     {
-        return Invoke(ref RootReverse<TInitial>.Instance, in processStream, in span, stackAllocationCount);
+        return Invoke(ref Root<TInitial>.Instance, in processStream, in span, stackAllocationCount);
 
         static TResult Invoke<TRootInitial>(ref TRootInitial root, in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
             where TRootInitial : IStreamNode<TInitial, TInitial> =>
             root.Execute<TInitial, TResult, TProcessStream>(in processStream, in span, stackAllocationCount);
     }
 
-    TResult IStreamNode<TInitial, TInitial>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+    public TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+        where TProcessStream : struct, IProcessStream<TInitial, TFinal, TResult>
     {
         if (!stackAllocationCount.HasValue || stackAllocationCount <= 0)
             return NoStack<TFinal, TResult, TProcessStream>(in processStream, in span);
@@ -73,12 +74,9 @@ public /*readonly*/ struct RootReverse<TInitial>
 
     public bool TryGetNext(ref EnumeratorState<TInitial> state, out TInitial current)
     {
-        var stateIdx = state.Index;
-        var idx = state.Span.Length - stateIdx - 1;
-        if (idx >= 0)
+        if (state.Index < state.Span.Length)
         {
-            state.Index = stateIdx + 1;
-            current = state.Span[idx];
+            current = state.Span[state.Index++];
             return true;
         }
         current = default!;

@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace Cistern.SpanStream.Maths
+namespace Cistern.Spanner.Maths
 {
     public enum BatchProcessResult
     {

@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace Cistern.SpanStream.Terminators;
+namespace Cistern.Spanner.Terminators;
 
 public struct ArrayBuilder<T>
 {

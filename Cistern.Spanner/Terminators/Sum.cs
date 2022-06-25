@@ -1,7 +1,7 @@
-﻿using Cistern.SpanStream.Maths;
+﻿using Cistern.Spanner.Maths;
 using Cistern.Utils;
 
-namespace Cistern.SpanStream.Terminators;
+namespace Cistern.Spanner.Terminators;
 
 struct Sum<T, Accumulator, Quotient, Math>
     : IProcessStream<T, T, T>

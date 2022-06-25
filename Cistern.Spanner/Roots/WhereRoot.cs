@@ -1,7 +1,7 @@
 ﻿using Cistern.Utils;
 using System.Runtime.InteropServices;
 
-namespace Cistern.SpanStream.Roots;
+namespace Cistern.Spanner.Roots;
 
 public /*readonly*/ struct WhereRoot<TInitial>
     : IStreamNode<TInitial, TInitial>

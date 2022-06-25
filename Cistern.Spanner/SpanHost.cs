@@ -1,4 +1,4 @@
-﻿namespace Cistern.SpanStream;
+﻿namespace Cistern.Spanner;
 
 public /*readonly*/ ref struct SpanHost<TInitial, TCurrent, TStreamNode>
     where TStreamNode : struct, IStreamNode<TInitial, TCurrent>

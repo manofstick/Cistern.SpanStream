@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cistern.SpanStream\Cistern.SpanStream.csproj" />
+    <ProjectReference Include="..\Cistern.Spanner\Cistern.Spanner.csproj" />
   </ItemGroup>
 
 </Project>

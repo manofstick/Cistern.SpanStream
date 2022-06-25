@@ -1,11 +1,11 @@
-﻿using Cistern.SpanStream.Maths;
-using Cistern.SpanStream.Roots;
-using Cistern.SpanStream.Terminators;
-using Cistern.SpanStream.Transforms;
+﻿using Cistern.Spanner.Maths;
+using Cistern.Spanner.Roots;
+using Cistern.Spanner.Terminators;
+using Cistern.Spanner.Transforms;
 using System.Buffers;
 using System.Collections.Immutable;
 
-namespace Cistern.SpanStream;
+namespace Cistern.Spanner;
 
 using SumDecimal         = Sum        <decimal, decimal, decimal, OpsDecimal>;
 using SumDecimalNullable = SumNullable<decimal, decimal, decimal, OpsDecimal>;

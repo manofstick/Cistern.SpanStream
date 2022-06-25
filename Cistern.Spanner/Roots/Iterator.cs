@@ -1,6 +1,6 @@
 ﻿using Cistern.Utils;
 
-namespace Cistern.SpanStream.Roots
+namespace Cistern.Spanner.Roots
 {
     internal static class Iterator
     {

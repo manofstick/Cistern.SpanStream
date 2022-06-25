@@ -1,4 +1,4 @@
-﻿using Cistern.SpanStream;
+﻿using Cistern.Spanner;
 using System.Runtime.InteropServices;
 
 namespace Cistern.Utils;

@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Cistern.SpanStream.Maths
+namespace Cistern.Spanner.Maths
 {
     static class MathOperationError
     {

@@ -1,9 +1,9 @@
-﻿using Cistern.SpanStream.Roots;
-using Cistern.SpanStream.Terminators;
+﻿using Cistern.Spanner.Roots;
+using Cistern.Spanner.Terminators;
 using Cistern.Utils;
 using System.Buffers;
 
-namespace Cistern.SpanStream.Transforms;
+namespace Cistern.Spanner.Transforms;
 
 class EmptyReverseArray<T>
 {
