@@ -1,14 +1,10 @@
 ﻿using Cistern.Spanner.Roots;
 using Cistern.Spanner.Terminators;
+using Cistern.Spanner.Utils;
 using Cistern.Utils;
 using System.Buffers;
 
 namespace Cistern.Spanner.Transforms;
-
-class EmptyReverseArray<T>
-{
-    static internal T[] Instance = new T[0]; // not Array<T>.Empty!!
-}
 
 public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
     : IStreamNode<TInitial, TInput>
@@ -22,8 +18,14 @@ public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
     private int _index;
     private TInput[] _reversed;
 
-    public Reverse(ref TPriorNode nodeT, int? stackElementCount, ArrayPool<TInput>? maybeArrayPool) =>
-        (Node, _stackElementCount, _maybeArrayPool, _reversed, _index) = (nodeT, stackElementCount??0, maybeArrayPool, EmptyReverseArray<TInput>.Instance, int.MaxValue);
+    public Reverse(ref TPriorNode nodeT, int? stackElementCount, ArrayPool<TInput>? maybeArrayPool)
+    {
+        Node = nodeT;
+        _stackElementCount = stackElementCount ?? 0;
+        _maybeArrayPool = maybeArrayPool;
+        _reversed = UninitializedArrayStandIn<TInput>.Instance;
+        _index = int.MaxValue;
+    }
 
     int? IStreamNode<TInitial, TInput>.TryGetSize(int sourceSize, out int upperBound) => Node.TryGetSize(sourceSize, out upperBound);
 
@@ -54,7 +56,7 @@ public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
 
     bool LesserPath(ref EnumeratorState<TInitial> state, out TInput current)
     {
-        if (_reversed == EmptyReverseArray<TInput>.Instance)
+        if (UninitializedArrayStandIn.IsArrayUninitialized(_reversed))
         {
             _index = 0;
             var span = state.Span[state.Index..];

@@ -28,28 +28,28 @@ Else ==
 |         Method |    N |        Mean |     Error |    StdDev |      Median | Ratio | RatioSD |  Gen 0 | Allocated |
 |--------------- |----- |------------:|----------:|----------:|------------:|------:|--------:|-------:|----------:|
 |     Spanner |    1 |    218.9 ns |   1.38 ns |   1.29 ns |    218.6 ns |  0.88 |    0.00 |      - |         - |
-| SpanStream_Sum |    1 |    247.6 ns |   0.79 ns |   0.74 ns |    247.1 ns |  1.00 |    0.00 |      - |         - |
+| Spanner_Sum |    1 |    247.6 ns |   0.79 ns |   0.74 ns |    247.1 ns |  1.00 |    0.00 |      - |         - |
 |           Linq |    1 |    368.9 ns |   2.36 ns |   2.09 ns |    369.4 ns |  1.49 |    0.01 | 0.0877 |     368 B |
 |       Linq_Sum |    1 |    370.9 ns |   1.57 ns |   1.47 ns |    370.6 ns |  1.50 |    0.01 | 0.0877 |     368 B |
 |       HonkPerf |    1 |    108.6 ns |   0.20 ns |   0.39 ns |    108.4 ns |  0.44 |    0.00 |      - |         - |
 |   HonkPerf_Sum |    1 |    177.8 ns |   0.61 ns |   0.54 ns |    177.8 ns |  0.72 |    0.00 |      - |         - |
 |                |      |             |           |           |             |       |         |        |           |
 |     Spanner |   10 |    388.8 ns |   2.03 ns |   1.90 ns |    388.2 ns |  1.07 |    0.01 |      - |         - |
-| SpanStream_Sum |   10 |    362.7 ns |   4.74 ns |   4.43 ns |    360.0 ns |  1.00 |    0.00 |      - |         - |
+| Spanner_Sum |   10 |    362.7 ns |   4.74 ns |   4.43 ns |    360.0 ns |  1.00 |    0.00 |      - |         - |
 |           Linq |   10 |    679.4 ns |   3.10 ns |   2.90 ns |    677.7 ns |  1.87 |    0.03 | 0.0877 |     368 B |
 |       Linq_Sum |   10 |    643.9 ns |   3.49 ns |   2.92 ns |    644.2 ns |  1.78 |    0.02 | 0.0877 |     368 B |
 |       HonkPerf |   10 |    261.2 ns |   1.46 ns |   1.37 ns |    261.6 ns |  0.72 |    0.01 |      - |         - |
 |   HonkPerf_Sum |   10 |    344.1 ns |   1.92 ns |   1.70 ns |    343.5 ns |  0.95 |    0.01 |      - |         - |
 |                |      |             |           |           |             |       |         |        |           |
 |     Spanner |  100 |  1,851.3 ns |   8.78 ns |   8.22 ns |  1,851.5 ns |  1.24 |    0.01 |      - |         - |
-| SpanStream_Sum |  100 |  1,495.2 ns |   5.16 ns |   4.57 ns |  1,492.1 ns |  1.00 |    0.00 |      - |         - |
+| Spanner_Sum |  100 |  1,495.2 ns |   5.16 ns |   4.57 ns |  1,492.1 ns |  1.00 |    0.00 |      - |         - |
 |           Linq |  100 |  3,116.7 ns |  19.14 ns |  17.90 ns |  3,117.8 ns |  2.09 |    0.01 | 0.0877 |     368 B |
 |       Linq_Sum |  100 |  3,156.1 ns |  16.66 ns |  15.58 ns |  3,154.0 ns |  2.11 |    0.01 | 0.0877 |     368 B |
 |       HonkPerf |  100 |  1,716.2 ns |   7.70 ns |   7.20 ns |  1,717.1 ns |  1.15 |    0.01 |      - |         - |
 |   HonkPerf_Sum |  100 |  2,054.1 ns |  10.01 ns |   9.37 ns |  2,047.1 ns |  1.37 |    0.01 |      - |         - |
 |                |      |             |           |           |             |       |         |        |           |
 |     Spanner | 1000 | 15,778.8 ns |  81.16 ns |  75.92 ns | 15,726.3 ns |  1.12 |    0.01 |      - |         - |
-| SpanStream_Sum | 1000 | 14,075.2 ns |  69.54 ns |  65.05 ns | 14,028.5 ns |  1.00 |    0.00 |      - |         - |
+| Spanner_Sum | 1000 | 14,075.2 ns |  69.54 ns |  65.05 ns | 14,028.5 ns |  1.00 |    0.00 |      - |         - |
 |           Linq | 1000 | 30,947.8 ns | 156.06 ns | 145.98 ns | 30,863.5 ns |  2.20 |    0.01 | 0.0610 |     368 B |
 |       Linq_Sum | 1000 | 32,218.5 ns |  12.25 ns |   9.56 ns | 32,218.6 ns |  2.29 |    0.01 | 0.0610 |     368 B |
 |       HonkPerf | 1000 | 16,695.7 ns |   6.56 ns |   5.48 ns | 16,697.8 ns |  1.19 |    0.01 |      - |         - |
@@ -99,9 +99,9 @@ public class FirstTest
 
         var tests = new Func<int>[]
         {
-            Manual,
-            Spanner,
-            SpanStream_Enumerator,
+            //Manual,
+            //Spanner,
+            Spanner_Enumerator,
             Linq,
             Linq_Enumerator,
         };
@@ -137,7 +137,7 @@ public class FirstTest
 
     static readonly Func<int, bool> CurrentPredicate = FiftyFifty;
 
-    [Benchmark]
+//    [Benchmark]
     public int Manual()
     {
         var sum = 0;
@@ -147,25 +147,23 @@ public class FirstTest
         return sum;
     }
 
-    [Benchmark]
+    //[Benchmark]
     public int Spanner()
     {
         return
             data.Span
             .Select(x => x)
-            .Reverse()
-            .Reverse()
+            .OrderBy(x => x)
             .Aggregate((a, c) => (a * a) + c);
     }
 
     [Benchmark]
-    public int SpanStream_Enumerator()
+    public int Spanner_Enumerator()
     {
         var x =
             data.Span
             .Select(x => x)
-            .Reverse()
-            .Reverse();
+            .OrderBy(x => x);
 
         var sum = 0;
         foreach (var item in x)
@@ -179,8 +177,7 @@ public class FirstTest
         return
             _asArray
             .Select(x => x)
-            .Reverse()
-            .Reverse()
+            .OrderBy(x => x)
             .Aggregate((a, c) => (a * a) + c);
     }
 
@@ -190,8 +187,7 @@ public class FirstTest
         var x =
             _asArray
             .Select(x => x)
-            .Reverse()
-            .Reverse();
+            .OrderBy(x => x);
 
         var sum = 0;
         foreach (var item in x)
@@ -214,7 +210,7 @@ public class Program
         //    {
         //        ttotal +=
         //            d.AsSpan()
-        //            .ToSpanStream()
+        //            .ToSpanner()
         //            .Where(x => x > 128)
         //            .Aggregate(0, (a, c) => a + c);
         //    }

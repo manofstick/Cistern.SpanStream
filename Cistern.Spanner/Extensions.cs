@@ -178,8 +178,11 @@ public static class Extensions
     //- [ ] `TInitial? MinBy<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
     //- [ ] `TInitial? MinBy<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
     //- [ ] `IEnumerable<TResult> OfType<TResult>(this IEnumerable source);`
-    //- [ ] `IOrderedEnumerable<TInitial> OrderBy<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
-    //- [ ] `IOrderedEnumerable<TInitial> OrderBy<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
+
+    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, TKey, TNode>> OrderBy<TInitial, TCurrent, TKey, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TKey> getKey, IComparer<TKey>? comparer = null, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+        new(in source.Span, new(ref source.Node, getKey, comparer, stackElementCount, maybeArrayPool));
+
     //- [ ] `IOrderedEnumerable<TInitial> OrderByDescending<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
     //- [ ] `IOrderedEnumerable<TInitial> OrderByDescending<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
     //- [ ] `IEnumerable<TInitial> Prepend<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, TInitial element);`
