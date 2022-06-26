@@ -49,14 +49,14 @@ internal static class LargeStackAllocator
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    struct SequentialDataPair<T>
+    public struct SequentialDataPair<T>
     {
         public T Item1;
         public T Item2;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    struct MemoryChunk<T, TChunk>
+    public struct MemoryChunk<T, TChunk>
         where TChunk : struct
     {
         public T Head;

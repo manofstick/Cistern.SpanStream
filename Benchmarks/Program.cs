@@ -8,6 +8,8 @@ using System.Collections.Immutable;
 
 namespace Benchmarks;
 
+record Something(string name, int value1, int value2, int value3);
+
 /*
     data.Span
     .Append(42)
@@ -83,8 +85,8 @@ public class FirstTest
     [Params(100)]
     public int N { get; set; }
 
-    private ReadOnlyMemory<int> data;
-    private int[] _asArray = null!;
+    private ReadOnlyMemory<Something> data;
+    private Something[] _asArray = null!;
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -93,14 +95,14 @@ public class FirstTest
         _asArray =
             System.Linq.Enumerable
             .Range(0, N)
-            .Select(n => r.Next(n * 5))
+            .Select(n => new Something(Guid.NewGuid().ToString(), r.Next(n * 5), r.Next(n * 5), r.Next(n * 5)))
             .ToArray();
         data = _asArray;
 
         var tests = new Func<int>[]
         {
             //Manual,
-            //Spanner,
+            Spanner,
             Spanner_Enumerator,
             Linq,
             Linq_Enumerator,
@@ -143,18 +145,18 @@ public class FirstTest
         var sum = 0;
         //for(var i= _asArray.Length-1; i >= 0; --i)
         for (var i = 0; i < _asArray.Length; ++i)
-            sum = (sum * sum) + _asArray[i];
+            sum = (sum * sum) + _asArray[i].value3;
         return sum;
     }
 
-    //[Benchmark]
+    [Benchmark]
     public int Spanner()
     {
         return
             data.Span
             .Select(x => x)
-            .OrderBy(x => x)
-            .Aggregate((a, c) => (a * a) + c);
+            .OrderBy(x => x.name)
+            .Aggregate(0, (a, c) => (a * a) + c.value3);
     }
 
     [Benchmark]
@@ -163,11 +165,11 @@ public class FirstTest
         var x =
             data.Span
             .Select(x => x)
-            .OrderBy(x => x);
+            .OrderBy(x => x.name);
 
         var sum = 0;
         foreach (var item in x)
-            sum = (sum * sum) + item;
+            sum = (sum * sum) + item.value3;
         return sum;
     }
 
@@ -177,8 +179,8 @@ public class FirstTest
         return
             _asArray
             .Select(x => x)
-            .OrderBy(x => x)
-            .Aggregate((a, c) => (a * a) + c);
+            .OrderBy(x => x.name)
+            .Aggregate(0, (a, c) => (a * a) + c.value3);
     }
 
     [Benchmark]
@@ -187,11 +189,11 @@ public class FirstTest
         var x =
             _asArray
             .Select(x => x)
-            .OrderBy(x => x);
+            .OrderBy(x => x.name);
 
         var sum = 0;
         foreach (var item in x)
-            sum = (sum * sum) + item;
+            sum = (sum * sum) + item.value3;
         return sum;
     }
 }
