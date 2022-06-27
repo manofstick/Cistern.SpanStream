@@ -179,9 +179,15 @@ public static class Extensions
     //- [ ] `TInitial? MinBy<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
     //- [ ] `IEnumerable<TResult> OfType<TResult>(this IEnumerable source);`
 
-    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, TKey, TNode>> OrderBy<TInitial, TCurrent, TKey, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TKey> getKey, IComparer<TKey>? comparer = null, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
+    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, SingleKeyWithComparer<TKey>, SingleKeyFactoryWithComparer<TCurrent, TKey>, TNode>> OrderBy<TInitial, TCurrent, TKey, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TKey> getKey, IComparer<TKey> comparer, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
         where TNode : struct, IStreamNode<TInitial, TCurrent> =>
-        new(in source.Span, new(ref source.Node, getKey, comparer, stackElementCount, maybeArrayPool));
+        new(in source.Span, new(ref source.Node, new (getKey, comparer), stackElementCount, maybeArrayPool));
+    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, TKey, SingleKeyFactory<TCurrent, TKey>, TNode>> OrderBy<TInitial, TCurrent, TKey, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, TKey> getKey, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+        new(in source.Span, new(ref source.Node, new(getKey), stackElementCount, maybeArrayPool));
+    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, SingleKeyWithComparer<string>, SingleKeyFactoryWithComparer<TCurrent, string>, TNode>> OrderBy<TInitial, TCurrent, TNode>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TCurrent, string> getKey, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+        new(in source.Span, new(ref source.Node, new(getKey, StringComparer.CurrentCulture), stackElementCount, maybeArrayPool));
 
     //- [ ] `IOrderedEnumerable<TInitial> OrderByDescending<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector);`
     //- [ ] `IOrderedEnumerable<TInitial> OrderByDescending<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
@@ -290,8 +296,23 @@ public static class Extensions
     //- [ ] `IEnumerable<TInitial> TakeLast<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, int count);`
     //- [ ] `IEnumerable<TInitial> TakeWhile<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, bool> predicate);`
     //- [ ] `IEnumerable<TInitial> TakeWhile<TInitial>(this SpanHost<TInitial, TCurrent, TNode> source, Func<TInitial, int, bool> predicate);`
-    //- [ ] `IOrderedEnumerable<TInitial> ThenBy<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector);`
-    //- [ ] `IOrderedEnumerable<TInitial> ThenBy<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
+
+
+    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, CompositeKey<TKey, TCurrentKey>, CompositeKeyFactory<TCurrent, TKey, TCurrentKey, TCurrentKeyFactory>, TNode>> ThenBy<TInitial, TCurrent, TKey, TCurrentKey, TCurrentKeyFactory, TNode>(this SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, TCurrentKey, TCurrentKeyFactory, TNode>> source, Func<TCurrent, TKey> getKey, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
+        where TNode : struct, IStreamNode<TInitial, TCurrent>
+        where TCurrentKeyFactory : struct, IKeyFactory<TCurrent, TCurrentKey> =>
+        new(in source.Span, new(ref source.Node.Node, new(getKey, source.Node._keyFactory), stackElementCount, maybeArrayPool));
+    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, CompositeKeyWithComparer<TKey, TCurrentKey>, CompositeKeyFactoryWithComparer<TCurrent, TKey, TCurrentKey, TCurrentKeyFactory>, TNode>> ThenBy<TInitial, TCurrent, TKey, TCurrentKey, TCurrentKeyFactory, TNode>(this SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, TCurrentKey, TCurrentKeyFactory, TNode>> source, Func<TCurrent, TKey> getKey, IComparer<TKey> comparer, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
+        where TNode : struct, IStreamNode<TInitial, TCurrent>
+        where TCurrentKeyFactory : struct, IKeyFactory<TCurrent, TCurrentKey> =>
+        new(in source.Span, new(ref source.Node.Node, new(getKey, comparer, source.Node._keyFactory), stackElementCount, maybeArrayPool));
+#if HANDLE_SPECIFIC_STRING_COMPARER
+    public static SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, CompositeKeyWithComparer<string, TCurrentKey>, CompositeKeyFactoryWithComparer<TCurrent, string, TCurrentKey, TCurrentKeyFactory>, TNode>> ThenBy<TInitial, TCurrent, TCurrentKey, TCurrentKeyFactory, TNode>(this SpanHost<TInitial, TCurrent, OrderBy<TInitial, TCurrent, TCurrentKey, TCurrentKeyFactory, TNode>> source, Func<TCurrent, string> getKey, int stackElementCount = 100, ArrayPool<TCurrent>? maybeArrayPool = null)
+        where TNode : struct, IStreamNode<TInitial, TCurrent>
+        where TCurrentKeyFactory : struct, IKeyFactory<TCurrent, TCurrentKey> =>
+        new(in source.Span, new(ref source.Node.Node, new(getKey, StringComparer.CurrentCulture, source.Node._keyFactory), stackElementCount, maybeArrayPool));
+#endif
+
     //- [ ] `IOrderedEnumerable<TInitial> ThenByDescending<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector);`
     //- [ ] `IOrderedEnumerable<TInitial> ThenByDescending<TInitial, TKey>(this IOrderedEnumerable<TInitial> source, Func<TInitial, TKey> keySelector, IComparer<TKey>? comparer);`
 

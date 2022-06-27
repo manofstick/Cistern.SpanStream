@@ -95,7 +95,7 @@ public class FirstTest
         _asArray =
             System.Linq.Enumerable
             .Range(0, N)
-            .Select(n => new Something(Guid.NewGuid().ToString(), r.Next(n * 5), r.Next(n * 5), r.Next(n * 5)))
+            .Select(n => new Something(Guid.NewGuid().ToString(), r.Next(n * 2), r.Next(n * 2), r.Next(n * 2)))
             .ToArray();
         data = _asArray;
 
@@ -155,8 +155,10 @@ public class FirstTest
         return
             data.Span
             .Select(x => x)
-            .OrderBy(x => x.name)
-            .Aggregate(0, (a, c) => (a * a) + c.value3);
+            .OrderBy(x => x.value1)
+            .ThenBy(x => x.name)
+            .Aggregate(0, (a, c) => (a * a) + c.value3)
+            ;
     }
 
     [Benchmark]
@@ -165,7 +167,9 @@ public class FirstTest
         var x =
             data.Span
             .Select(x => x)
-            .OrderBy(x => x.name);
+            .OrderBy(x => x.value1)
+            .ThenBy(x => x.name)
+            ;
 
         var sum = 0;
         foreach (var item in x)
@@ -179,7 +183,8 @@ public class FirstTest
         return
             _asArray
             .Select(x => x)
-            .OrderBy(x => x.name)
+            .OrderBy(x => x.value1)
+            .ThenBy(x => x.name)
             .Aggregate(0, (a, c) => (a * a) + c.value3);
     }
 
@@ -189,7 +194,9 @@ public class FirstTest
         var x =
             _asArray
             .Select(x => x)
-            .OrderBy(x => x.name);
+            .OrderBy(x => x.value1)
+            .ThenBy(x => x.name)
+            ;
 
         var sum = 0;
         foreach (var item in x)
