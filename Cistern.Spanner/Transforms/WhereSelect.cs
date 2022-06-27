@@ -17,7 +17,7 @@ public /*readonly*/ struct WhereSelect<TInitial, TInput, TOutput, TPriorNode>
     int? IStreamNode<TInitial, TOutput>.TryGetSize(int sourceSize, out int upperBound)
     {
         Node.TryGetSize(sourceSize, out upperBound);
-        return 0;
+        return null;
     }
 
     TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>

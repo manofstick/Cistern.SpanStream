@@ -7,31 +7,6 @@ using System.Runtime.InteropServices;
 
 namespace Cistern.Spanner.Transforms;
 
-struct KeySortable<T, TComparer, U>
-    : IComparable<KeySortable<T, TComparer, U>>
-    where U : IComparable<U>
-    where TComparer : IComparer<T>
-{
-    TComparer _comparer;
-    T _t;
-    U _u;
-
-    public KeySortable(T t, TComparer comparer, U u)
-    {
-        _t = t;
-        _comparer = comparer;
-        _u = u;
-    }
-
-    public int CompareTo(KeySortable<T, TComparer, U> other)
-    {
-        var c = _comparer.Compare(_t, other._t);
-        if (c != 0)
-            return c;
-        return _u.CompareTo(other._u);
-    }
-}
-
 public /*readonly*/ struct OrderBy<TInitial, TInput, TKey, TPriorNode>
     : IStreamNode<TInitial, TInput>
     where TPriorNode : struct, IStreamNode<TInitial, TInput>
@@ -77,8 +52,8 @@ public /*readonly*/ struct OrderBy<TInitial, TInput, TKey, TPriorNode>
         }
         else
         {
-            var reversedArray = CreateOrderByArray(span);
-            return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(processStream, reversedArray.ToReadOnlySpan(), 0);
+            var orderedArray = CreateOrderByArray(span);
+            return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(processStream, orderedArray.ToReadOnlySpan(), 0);
         }
     }
 
@@ -145,13 +120,6 @@ public struct OrderByArrayOnStreamState<TInput, TKey>
     }
 }
 
-internal interface IAfterAllocation<TInitial, TNext, TState>
-{
-    TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream stream, in ReadOnlySpan<TInitial> span, ref StreamState<TFinal> builder, in TState state)
-        where TProcessStream : struct, IProcessStream<TNext, TFinal, TResult>;
-}
-
-
 static class OrderByHelpers
 {
     public static void SortByKey<T, TKey>(Span<T> source, Func<T, TKey> getKey, IComparer<TKey> comparer)
@@ -178,7 +146,6 @@ static class OrderByHelpers
         keys.Sort(source, comparer);
     }
 }
-
 
 public struct OrderByOnStreamState<TInput, TKey, TFinal, TResult, TProcessStream>
     : IProcessStream<TInput, TInput, TResult>

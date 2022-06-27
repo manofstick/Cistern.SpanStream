@@ -27,7 +27,8 @@ public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
         _index = int.MaxValue;
     }
 
-    int? IStreamNode<TInitial, TInput>.TryGetSize(int sourceSize, out int upperBound) => Node.TryGetSize(sourceSize, out upperBound);
+    int? IStreamNode<TInitial, TInput>.TryGetSize(int sourceSize, out int upperBound) =>
+        Node.TryGetSize(sourceSize, out upperBound);
 
     public TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
         where TProcessStream : struct, IProcessStream<TInput, TFinal, TResult>

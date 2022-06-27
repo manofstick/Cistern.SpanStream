@@ -13,7 +13,8 @@ public /*readonly*/ struct Select<TInitial, TInput, TOutput, TPriorNode>
     public Select(ref TPriorNode nodeT, Func<TInput, TOutput> selector) =>
         (Node, Selector) = (nodeT, selector);
 
-    int? IStreamNode<TInitial, TOutput>.TryGetSize(int sourceSize, out int upperBound) => Node.TryGetSize(sourceSize, out upperBound);
+    int? IStreamNode<TInitial, TOutput>.TryGetSize(int sourceSize, out int upperBound) =>
+        Node.TryGetSize(sourceSize, out upperBound);
 
     TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
         Node.Execute<TFinal, TResult, SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(new(in processStream, Selector), in span, stackAllocationCount);
