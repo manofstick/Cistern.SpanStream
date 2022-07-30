@@ -90,5 +90,17 @@ namespace Cistern.Spanner.Roots
                 result[i] = selector(s[i]);
             return result;
         }
+
+        internal static List<TCurrent> WhereToList<TCurrent, TContext>(in ReadOnlySpan<TCurrent> span, Func<TCurrent, bool> predicate)
+        {
+            var result = new List<TCurrent>();
+            var s = span;
+            for (var i = 0; i < s.Length; ++i)
+            {
+                if (predicate(s[i]))
+                    result.Add(s[i]);
+            }
+            return result;
+        }
     }
 }

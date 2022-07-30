@@ -337,7 +337,13 @@ public static class Extensions
     //- [ ] `Dictionary<TKey, TElement> ToDictionary<TInitial, TKey, TElement>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
     //- [ ] `HashSet<TInitial> ToHashSet<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, IEqualityComparer<TInitial>? comparer);`
     //- [ ] `HashSet<TInitial> ToHashSet<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source);`
-    //- [ ] `List<TInitial> ToList<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source);`
+
+    public static List<TCurrent> ToList<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, TNode, TContext> source)
+        where TNode : struct, IStreamNode<TInitial, TCurrent>
+        => ToList<TCurrent>.Execute<TInitial, TNode, TContext>(in source.Span, ref source.Node);
+    public static List<TCurrent> ToList<TCurrent, TContext>(this SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>, TContext> source)
+        => Iterator.WhereToList<TCurrent, TContext>(in source.Span, source.Node.Predicate);
+
     //- [ ] `ILookup<TKey, TElement> ToLookup<TInitial, TKey, TElement>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector, IEqualityComparer<TKey>? comparer);`
     //- [ ] `ILookup<TKey, TElement> ToLookup<TInitial, TKey, TElement>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TInitial, TKey> keySelector, Func<TInitial, TElement> elementSelector);`
     //- [ ] `ILookup<TKey, TInitial> ToLookup<TInitial, TKey>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TInitial, TKey> keySelector);`
