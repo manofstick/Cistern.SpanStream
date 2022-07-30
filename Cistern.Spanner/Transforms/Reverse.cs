@@ -3,6 +3,7 @@ using Cistern.Spanner.Terminators;
 using Cistern.Spanner.Utils;
 using Cistern.Utils;
 using System.Buffers;
+using System.Xml.Linq;
 
 namespace Cistern.Spanner.Transforms;
 
@@ -30,18 +31,18 @@ public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
     int? IStreamNode<TInitial, TInput>.TryGetSize(int sourceSize, out int upperBound) =>
         Node.TryGetSize(sourceSize, out upperBound);
 
-    public TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+    public TResult Execute<TFinal, TResult, TProcessStream, TContext>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
         where TProcessStream : struct, IProcessStream<TInput, TFinal, TResult>
     {
         var _ = Node.TryGetSize(span.Length, out var upperBound);
         if (upperBound <= _stackElementCount)
         {
-            return Node.Execute<TInput, TResult, ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream>>(new(in processStream, upperBound), span, upperBound);
+            return Node.Execute<TInput, TResult, ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream, TContext>, TContext>(new(in processStream, upperBound), span, upperBound);
         }
         else
         {
             var reversedArray = CreateReversedArray(span);
-            return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(processStream, reversedArray.ToReadOnlySpan(), 0);
+            return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream, TContext>(processStream, reversedArray.ToReadOnlySpan(), 0);
         }
     }
 
@@ -71,13 +72,13 @@ public /*readonly*/ struct Reverse<TInitial, TInput, TPriorNode>
 
     private TInput[] CreateReversedArray(in ReadOnlySpan<TInitial> span)
     {
-        var reversed = ToArray<TInput>.Execute(span, ref Node, _stackElementCount, _maybeArrayPool);
+        var reversed = ToArray<TInput>.Execute<TInitial, TPriorNode, object>(span, ref Node, _stackElementCount, _maybeArrayPool);
         Array.Reverse(reversed);
         return reversed;
     }
 }
 
-public struct ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream>
+public struct ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream, TContext>
     : IProcessStream<TInput, TInput, TResult>
         where TProcessStream : struct, IProcessStream<TInput, TFinal, TResult>
 {
@@ -89,7 +90,7 @@ public struct ReverseOnStreamState<TInput, TFinal, TResult, TProcessStream>
         (_processStream, _size, _index) = (processStream, size, size);
 
     public TResult GetResult(ref StreamState<TInput> builder) =>
-        Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(_processStream, builder.Current[_index.._size], 0);
+        Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream, TContext>(_processStream, builder.Current[_index.._size], 0);
 
     public bool ProcessNext(ref StreamState<TInput> builder, in TInput input)
     {

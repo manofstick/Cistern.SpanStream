@@ -20,8 +20,8 @@ public /*readonly*/ struct WhereSelect<TInitial, TInput, TOutput, TPriorNode>
         return null;
     }
 
-    TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
-        Node.Execute<TFinal, TResult, WhereSelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(new(in processStream, Predicate, Selector), in span, stackAllocationCount);
+    TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream, TContext>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
+        Node.Execute<TFinal, TResult, WhereSelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>, TContext>(new(in processStream, Predicate, Selector), in span, stackAllocationCount);
 
     public bool TryGetNext(ref EnumeratorState<TInitial> state, out TOutput current)
     {

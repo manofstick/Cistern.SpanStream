@@ -22,8 +22,8 @@ public /*readonly*/ struct Append<TInitial, TInput, TPriorNode>
         return maybeSize + 1;
     }
 
-    TResult IStreamNode<TInitial, TInput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
-        Node.Execute<TFinal, TResult, AppendStream<TInput, TFinal, TResult, TProcessStream>>(new(in processStream, Item), in span, stackAllocationCount);
+    TResult IStreamNode<TInitial, TInput>.Execute<TFinal, TResult, TProcessStream, TContext>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
+        Node.Execute<TFinal, TResult, AppendStream<TInput, TFinal, TResult, TProcessStream>, TContext>(new(in processStream, Item), in span, stackAllocationCount);
 
     public bool TryGetNext(ref EnumeratorState<TInitial> state, out TInput current)
     {

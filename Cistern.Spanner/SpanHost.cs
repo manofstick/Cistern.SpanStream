@@ -1,6 +1,6 @@
 ﻿namespace Cistern.Spanner;
 
-public /*readonly*/ ref struct SpanHost<TInitial, TCurrent, TStreamNode>
+public /*readonly*/ ref struct SpanHost<TInitial, TCurrent, TStreamNode, TContext>
     where TStreamNode : struct, IStreamNode<TInitial, TCurrent>
 {
     internal /*public readonly*/ ReadOnlySpan<TInitial> Span;
@@ -12,14 +12,17 @@ public /*readonly*/ ref struct SpanHost<TInitial, TCurrent, TStreamNode>
         Node = node;
     }
 
-    public EnumeratorHost<TInitial, TCurrent, TStreamNode> GetEnumerator() => new(ref this);
+    public EnumeratorHost<TInitial, TCurrent, TStreamNode> GetEnumerator() => new(in Span, in Node);
 
     public int? TryGetSize(out int upperBound) =>
         Node.TryGetSize(Span.Length, out upperBound);
 
+    public SpanHost<TInitial, TCurrent, TStreamNode, TNewContext> SetContext<TNewContext>()
+        where TNewContext : struct => new (in Span, in Node);
+
     public TResult Execute<TResult, TProcessStream>(TProcessStream finalNode, int? stackAllocationCount = null)
         where TProcessStream : struct, IProcessStream<TCurrent, TCurrent, TResult> =>
-        Node.Execute<TCurrent, TResult, TProcessStream>(in finalNode, in Span, stackAllocationCount);
+        Node.Execute<TCurrent, TResult, TProcessStream, TContext>(in finalNode, in Span, stackAllocationCount);
 }
 
 public ref struct EnumeratorState<T>
@@ -36,10 +39,10 @@ public ref struct EnumeratorHost<TInitial, TCurrent, TStreamNode>
     EnumeratorState<TInitial> _state;
     TCurrent _current;
 
-    internal EnumeratorHost(ref SpanHost<TInitial, TCurrent, TStreamNode> parent)
+    internal EnumeratorHost(in ReadOnlySpan<TInitial> span, in TStreamNode node)
     {
-        _node = parent.Node;
-        _state = new() { Span = parent.Span };
+        _node = node;
+        _state = new() { Span = span };
         _current = default!;
     }
 

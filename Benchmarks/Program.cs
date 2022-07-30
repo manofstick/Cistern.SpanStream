@@ -8,6 +8,7 @@ using System.Collections.Immutable;
 
 namespace Benchmarks;
 
+
 record Something(string name, int value1, int value2, int value3);
 
 /*
@@ -79,14 +80,15 @@ public class FirstTest
         }
     }
 
-#if LONG
-    //[Params(1, 10, 100, 1000)]
-#endif
+#if true
+    [Params(0, 1, 10, 100, 1000)]
+#else
     [Params(100)]
+#endif
     public int N { get; set; }
 
-    private ReadOnlyMemory<Something> data;
-    private Something[] _asArray = null!;
+    private ReadOnlyMemory<int> data;
+    private int[] _asArray = null!;
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -95,7 +97,7 @@ public class FirstTest
         _asArray =
             System.Linq.Enumerable
             .Range(0, N)
-            .Select(n => new Something(Guid.NewGuid().ToString(), r.Next(n * 2), r.Next(n * 2), r.Next(n * 2)))
+            .Select(n => r.Next(N))
             .ToArray();
         data = _asArray;
 
@@ -109,7 +111,7 @@ public class FirstTest
         };
 
         var baseline = tests[0]();
-        for (var i=1; i < tests.Length; ++i)
+        for (var i = 1; i < tests.Length; ++i)
         {
             var check = tests[i]();
             Validate(baseline, check);
@@ -123,7 +125,7 @@ public class FirstTest
 
     private static void Validate(int baseline, int check)
     {
-        if (baseline!=check)
+        if (baseline != check)
             throw new Exception("Validation error");
     }
 
@@ -139,13 +141,13 @@ public class FirstTest
 
     static readonly Func<int, bool> CurrentPredicate = FiftyFifty;
 
-//    [Benchmark]
+    //    [Benchmark]
     public int Manual()
     {
         var sum = 0;
         //for(var i= _asArray.Length-1; i >= 0; --i)
         for (var i = 0; i < _asArray.Length; ++i)
-            sum = (sum * sum) + _asArray[i].value3;
+            sum = (sum * sum) + _asArray[i];
         return sum;
     }
 
@@ -154,10 +156,13 @@ public class FirstTest
     {
         return
             data.Span
-            .Select(x => x)
-            .OrderBy(x => x.value1)
-            .ThenBy(x => x.name)
-            .Aggregate(0, (a, c) => (a * a) + c.value3)
+            .Append(42)
+            .Where(FiftyFifty)
+            .Append(42)
+            .Select(x => x * 2)
+            .Append(42)
+            .Where(AlwaysTrue)
+            .Sum()
             ;
     }
 
@@ -166,14 +171,17 @@ public class FirstTest
     {
         var x =
             data.Span
-            .Select(x => x)
-            .OrderBy(x => x.value1)
-            .ThenBy(x => x.name)
+            .Append(42)
+            .Where(FiftyFifty)
+            .Append(42)
+            .Select(x => x * 2)
+            .Append(42)
+            .Where(AlwaysTrue)
             ;
 
         var sum = 0;
         foreach (var item in x)
-            sum = (sum * sum) + item.value3;
+            sum += item;
         return sum;
     }
 
@@ -182,10 +190,13 @@ public class FirstTest
     {
         return
             _asArray
-            .Select(x => x)
-            .OrderBy(x => x.value1)
-            .ThenBy(x => x.name)
-            .Aggregate(0, (a, c) => (a * a) + c.value3);
+            .Append(42)
+            .Where(FiftyFifty)
+            .Append(42)
+            .Select(x => x * 2)
+            .Append(42)
+            .Where(AlwaysTrue)
+            .Sum();
     }
 
     [Benchmark]
@@ -193,14 +204,53 @@ public class FirstTest
     {
         var x =
             _asArray
-            .Select(x => x)
-            .OrderBy(x => x.value1)
-            .ThenBy(x => x.name)
+            .Append(42)
+            .Where(FiftyFifty)
+            .Append(42)
+            .Select(x => x * 2)
+            .Append(42)
+            .Where(AlwaysTrue)
             ;
 
         var sum = 0;
         foreach (var item in x)
-            sum = (sum * sum) + item.value3;
+            sum += item;
+        return sum;
+    }
+
+
+    [Benchmark]
+    public int Honk()
+    {
+        return
+            _asArray
+            .ToRefLinq()
+            .Append(42)
+            .Where(FiftyFifty)
+            .Append(42)
+            .Select(x => x * 2)
+            .Append(42)
+            .Where(AlwaysTrue)
+            .Sum();
+    }
+
+    [Benchmark]
+    public int Honk_Enumerator()
+    {
+        var x =
+            _asArray
+            .ToRefLinq()
+            .Append(42)
+            .Where(FiftyFifty)
+            .Append(42)
+            .Select(x => x * 2)
+            .Append(42)
+            .Where(AlwaysTrue)
+            ;
+
+        var sum = 0;
+        foreach (var item in x)
+            sum += item;
         return sum;
     }
 }

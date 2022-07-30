@@ -4,6 +4,7 @@ using Cistern.Spanner.Utils;
 using Cistern.Utils;
 using System.Buffers;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 
 namespace Cistern.Spanner.Transforms;
 
@@ -143,18 +144,18 @@ public /*readonly*/ struct OrderBy<TInitial, TInput, TKey, TKeyFactory, TPriorNo
     int? IStreamNode<TInitial, TInput>.TryGetSize(int sourceSize, out int upperBound) =>
         Node.TryGetSize(sourceSize, out upperBound);
 
-    public TResult Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
+    public TResult Execute<TFinal, TResult, TProcessStream, TContext>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount)
         where TProcessStream : struct, IProcessStream<TInput, TFinal, TResult>
     {
         var _ = Node.TryGetSize(span.Length, out var upperBound);
         if (upperBound <= _stackElementCount)
         {
-            return Node.Execute<TInput, TResult, OrderByOnStreamState<TInput, TKey, TKeyFactory, TFinal, TResult, TProcessStream>>(new(in processStream, _keyFactory), span, upperBound);
+            return Node.Execute<TInput, TResult, OrderByOnStreamState<TInput, TKey, TKeyFactory, TFinal, TResult, TProcessStream>, TContext>(new(in processStream, _keyFactory), span, upperBound);
         }
         else
         {
-            var orderedArray = CreateOrderByArray(span);
-            return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(processStream, orderedArray.ToReadOnlySpan(), 0);
+            var orderedArray = CreateOrderByArray<TContext> (span);
+            return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream, TContext>(processStream, orderedArray.ToReadOnlySpan(), 0);
         }
     }
 
@@ -174,7 +175,7 @@ public /*readonly*/ struct OrderBy<TInitial, TInput, TKey, TKeyFactory, TPriorNo
         {
             _index = 0;
             var span = state.Span[state.Index..];
-            _ordered = CreateOrderByArray(in span);
+            _ordered = CreateOrderByArray<object>(in span);
             state.Index = state.Span.Length;
             return TryGetNext(ref state, out current);
         }
@@ -182,16 +183,16 @@ public /*readonly*/ struct OrderBy<TInitial, TInput, TKey, TKeyFactory, TPriorNo
         return false;
     }
 
-    private TInput[] CreateOrderByArray(in ReadOnlySpan<TInitial> span)
+    private TInput[] CreateOrderByArray<TContext>(in ReadOnlySpan<TInitial> span)
     {
-        var buffer = ToArray<TInput>.Execute(span, ref Node, _stackElementCount, _maybeArrayPool);
+        var buffer = ToArray<TInput>.Execute<TInitial, TPriorNode, TContext>(span, ref Node, _stackElementCount, _maybeArrayPool);
         if (buffer.Length <= _stackElementCount)
-            return Root<TInput>.Instance.Execute<TKey, TInput[], OrderByArrayOnStreamState<TInput, TKey, TKeyFactory>>(new(buffer, _keyFactory), buffer.AsSpan(), buffer.Length);
+            return Root<TInput>.Instance.Execute<TKey, TInput[], OrderByArrayOnStreamState<TInput, TKey, TKeyFactory>, TContext>(new(buffer, _keyFactory), buffer.AsSpan(), buffer.Length);
         else
         {
             var keyFactory = _keyFactory;
             var select = new SelectRoot<TInput, TKey>(input => { keyFactory.Create(input, out var key); return key; });
-            var keys = ToArray<TKey>.Execute(buffer.ToReadOnlySpan(), ref select, _stackElementCount, null);
+            var keys = ToArray<TKey>.Execute<TInput, SelectRoot<TInput, TKey>, TContext>(buffer.ToReadOnlySpan(), ref select, _stackElementCount, null);
             Array.Sort(keys, buffer);
             return buffer;
         }
@@ -268,7 +269,7 @@ public struct OrderByOnStreamState<TInput, TKey, TKeyFactory, TFinal, TResult, T
     {
         var source = builder.Current[.._index];
         OrderByHelpers.SortByKey<TInput, TKey, TKeyFactory>(source, _keyFactory);
-        return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream>(_processStream, source, 0);
+        return Root<TInput>.Instance.Execute<TFinal, TResult, TProcessStream, object>(_processStream, source, 0);
     }
 
     public bool ProcessNext(ref StreamState<TInput> builder, in TInput input)

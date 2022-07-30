@@ -16,8 +16,8 @@ public /*readonly*/ struct Select<TInitial, TInput, TOutput, TPriorNode>
     int? IStreamNode<TInitial, TOutput>.TryGetSize(int sourceSize, out int upperBound) =>
         Node.TryGetSize(sourceSize, out upperBound);
 
-    TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
-        Node.Execute<TFinal, TResult, SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>>(new(in processStream, Selector), in span, stackAllocationCount);
+    TResult IStreamNode<TInitial, TOutput>.Execute<TFinal, TResult, TProcessStream, TContext>(in TProcessStream processStream, in ReadOnlySpan<TInitial> span, int? stackAllocationCount) =>
+        Node.Execute<TFinal, TResult, SelectStream<TInput, TOutput, TFinal, TResult, TProcessStream>, TContext>(new(in processStream, Selector), in span, stackAllocationCount);
 
     public bool TryGetNext(ref EnumeratorState<TInitial> state, out TOutput current)
     {
