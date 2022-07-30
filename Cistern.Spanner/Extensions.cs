@@ -80,8 +80,12 @@ public static class Extensions
     //- [ ] `IEnumerable<TInitial> Concat<TInitial>(this IEnumerable<TInitial> first, IEnumerable<TInitial> second);`
     //- [ ] `bool Contains<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, TInitial value, IEqualityComparer<TInitial>? comparer);`
     //- [ ] `bool Contains<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, TInitial value);`
-    //- [ ] `int Count<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source);`
-    //- [ ] `int Count<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TInitial, bool> predicate);`
+    public static int Count<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, TNode, TContext> source)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> => source.Execute<int, Count<TCurrent>>(new());
+    public static int Count<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TCurrent, bool> predicate)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> => source.Where(predicate).Count();
+    public static int Count<TCurrent>(this ReadOnlySpan<TCurrent> source, Func<TCurrent, bool> predicate) => source.Where(predicate).Count();
+    public static int Count<TInitial, TCurrent, TNode, TContext>(this ReadOnlySpan<TCurrent> source) => source.Length;
     //- [ ] `IEnumerable<TInitial?> DefaultIfEmpty<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source);`
     //- [ ] `IEnumerable<TInitial> DefaultIfEmpty<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, TInitial defaultValue);`
     //- [ ] `IEnumerable<TInitial> Distinct<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source);`
