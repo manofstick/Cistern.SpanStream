@@ -84,6 +84,8 @@ public static class Extensions
         where TNode : struct, IStreamNode<TInitial, TCurrent> => source.Execute<int, Count<TCurrent>>(new());
     public static int Count<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TCurrent, bool> predicate)
         where TNode : struct, IStreamNode<TInitial, TCurrent> => source.Where(predicate).Count();
+    public static int Count<TCurrent, TContext>(this SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>, TContext> source)
+         => Iterator.WhereCount<TCurrent, TContext>(in source.Span, source.Node.Predicate);
     public static int Count<TCurrent>(this ReadOnlySpan<TCurrent> source, Func<TCurrent, bool> predicate) => source.Where(predicate).Count();
     public static int Count<TInitial, TCurrent, TNode, TContext>(this ReadOnlySpan<TCurrent> source) => source.Length;
     //- [ ] `IEnumerable<TInitial?> DefaultIfEmpty<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source);`

@@ -102,5 +102,17 @@ namespace Cistern.Spanner.Roots
             }
             return result;
         }
+
+        internal static int WhereCount<TCurrent, TContext>(in ReadOnlySpan<TCurrent> span, Func<TCurrent, bool> predicate)
+        {
+            var count = 0;
+            var s = span;
+            for (var i = 0; i < s.Length; ++i)
+            {
+                if (predicate(s[i]))
+                    ++count;
+            }
+            return count;
+        }
     }
 }
