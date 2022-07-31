@@ -1,7 +1,7 @@
 ﻿using Cistern.Utils;
 using System.Runtime.InteropServices;
 
-namespace Cistern.Spanner.Roots;
+namespace Cistern.Spanner.Ratchet.Roots;
 
 public /*readonly*/ struct SelectWhereRoot<TInput, TOutput>
     : IStreamNode<TInput, TOutput>
@@ -25,7 +25,7 @@ public /*readonly*/ struct SelectWhereRoot<TInput, TOutput>
             where TProcessStream : struct, IProcessStream<TOutput, TCurrent, TResult>
         {
             var localCopy = stream;
-            Iterator.SelectWhere<TInput, TCurrent, TOutput, TProcessStream, TContext>(ref state, in span, ref localCopy, selector, predicate);
+            IteratorEx.SelectWhere<TInput, TCurrent, TOutput, TProcessStream, TContext>(ref state, in span, ref localCopy, selector, predicate);
             return localCopy.GetResult(ref state);
         }
 

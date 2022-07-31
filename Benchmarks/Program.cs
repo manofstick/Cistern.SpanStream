@@ -3,6 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Cistern.Spanner;
+using Cistern.Spanner.Ratchet;
 using HonkPerf.NET.RefLinq;
 using System.Collections.Immutable;
 
@@ -80,7 +81,7 @@ public class FirstTest
         }
     }
 
-#if true
+#if truex
     [Params(0, 1, 10, 100, 1000)]
 #else
     [Params(100)]
@@ -103,7 +104,7 @@ public class FirstTest
 
         var tests = new Func<int>[]
         {
-            //Manual,
+            Manual,
             Spanner,
             Spanner_Enumerator,
             Linq,
@@ -141,13 +142,24 @@ public class FirstTest
 
     static readonly Func<int, bool> CurrentPredicate = FiftyFifty;
 
-    //    [Benchmark]
+#if true
+    [Benchmark(Baseline=true)]
+#endif
     public int Manual()
     {
         var sum = 0;
         //for(var i= _asArray.Length-1; i >= 0; --i)
         for (var i = 0; i < _asArray.Length; ++i)
-            sum = (sum * sum) + _asArray[i];
+        {
+            var x = _asArray[i];
+            x *= 3;
+            if ((x & 1) == 0)
+            {
+                x *= 3;
+                if ((x & 1) == 0)
+                    sum += x;
+            }
+        }
         return sum;
     }
 
@@ -156,27 +168,25 @@ public class FirstTest
     {
         return
             data.Span
-            .Append(42)
-            .Where(FiftyFifty)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
             .Sum()
             ;
     }
 
+#if true
     [Benchmark]
+#endif
     public int Spanner_Enumerator()
     {
         var x =
             data.Span
-            .Append(42)
-            .Where(FiftyFifty)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
             ;
 
         var sum = 0;
@@ -185,31 +195,31 @@ public class FirstTest
         return sum;
     }
 
+#if true
     [Benchmark]
+#endif
     public int Linq()
     {
         return
             _asArray
-            .Append(42)
-            .Where(FiftyFifty)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
             .Sum();
     }
 
+#if true
     [Benchmark]
+#endif
     public int Linq_Enumerator()
     {
         var x =
             _asArray
-            .Append(42)
-            .Where(FiftyFifty)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
             ;
 
         var sum = 0;
@@ -219,33 +229,33 @@ public class FirstTest
     }
 
 
+#if true
     [Benchmark]
+#endif
     public int Honk()
     {
         return
             _asArray
             .ToRefLinq()
-            .Append(42)
-            .Where(FiftyFifty)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
             .Sum();
     }
 
+#if true
     [Benchmark]
+#endif
     public int Honk_Enumerator()
     {
         var x =
             _asArray
             .ToRefLinq()
-            .Append(42)
-            .Where(FiftyFifty)
-            .Append(42)
-            .Select(x => x * 2)
-            .Append(42)
-            .Where(AlwaysTrue)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
+            .Select(x => x * 3)
+            .Where(x => (x & 1) == 0)
             ;
 
         var sum = 0;
