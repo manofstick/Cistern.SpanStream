@@ -3,7 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Cistern.Spanner;
-//using Cistern.Spanner.Ratchet;
+using Cistern.Spanner.Ratchet;
 using HonkPerf.NET.RefLinq;
 using System.Collections.Immutable;
 

@@ -12,7 +12,7 @@ public static class Extensions
 
     public static SpanHost<TInitial, TCurrent, AppendN<TInitial, TCurrent, AppendItem<TCurrent>, TNode>, TContext> Append<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, Append<TInitial, TCurrent, TNode>, TContext> source, TCurrent item)
         where TNode : struct, IStreamNode<TInitial, TCurrent> =>
-        new(in source.Span, new(ref source.Node.Node, new () { Item=item }, item, 2));
+        new(in source.Span, new(ref source.Node.Node, new () { Item=source.Node.Item }, item, 2));
     public static SpanHost<TInitial, TCurrent, AppendN<TInitial, TCurrent, AppendItems<TPreviousItems, TCurrent>, TNode>, TContext> Append<TInitial, TCurrent, TNode, TPreviousItems, TContext>(this SpanHost<TInitial, TCurrent, AppendN<TInitial, TCurrent, TPreviousItems, TNode>, TContext> source, TCurrent item)
         where TNode : struct, IStreamNode<TInitial, TCurrent>
         where TPreviousItems : struct =>
