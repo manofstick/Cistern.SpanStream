@@ -10,6 +10,14 @@ public static class Extensions
     public static int Count<TCurrent, TContext>(this SpanHost<TCurrent, TCurrent, WhereRoot<TCurrent>, TContext> source)
          => IteratorEx.WhereCount<TCurrent, TContext>(in source.Span, source.Node.Predicate);
 
+    public static SpanHost<TInitial, TCurrent, AppendN<TInitial, TCurrent, AppendItem<TCurrent>, TNode>, TContext> Append<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, Append<TInitial, TCurrent, TNode>, TContext> source, TCurrent item)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+        new(in source.Span, new(ref source.Node.Node, new () { Item=item }, item, 2));
+    public static SpanHost<TInitial, TCurrent, AppendN<TInitial, TCurrent, AppendItems<TPreviousItems, TCurrent>, TNode>, TContext> Append<TInitial, TCurrent, TNode, TPreviousItems, TContext>(this SpanHost<TInitial, TCurrent, AppendN<TInitial, TCurrent, TPreviousItems, TNode>, TContext> source, TCurrent item)
+        where TNode : struct, IStreamNode<TInitial, TCurrent>
+        where TPreviousItems : struct =>
+        new(in source.Span, new(ref source.Node.Node, source.Node.Items, item, source.Node.Count+1));
+
     public static SpanHost<TInitial, TCurrent, TNode, TContext> Reverse<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, Reverse<TInitial, TCurrent, TNode>, TContext> source)
         where TNode : struct, IStreamNode<TInitial, TCurrent> =>
         new(in source.Span, in source.Node.Node);

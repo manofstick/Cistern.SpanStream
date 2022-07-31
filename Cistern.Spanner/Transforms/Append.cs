@@ -48,17 +48,19 @@ struct AppendStream<TInput, TFinal, TResult, TProcessStream>
 {
     /* can't be readonly */ TProcessStream _next;
     readonly TInput _item;
+    private bool _continue;
 
     public AppendStream(in TProcessStream nextProcessStream, TInput item) =>
-        (_next, _item) = (nextProcessStream, item);
+        (_next, _item, _continue) = (nextProcessStream, item, true);
 
     TResult IProcessStream<TInput, TFinal, TResult>.GetResult(ref StreamState<TFinal> state)
     {
-        _next.ProcessNext(ref state, _item);
+        if (_continue)
+            _next.ProcessNext(ref state, _item);
         return _next.GetResult(ref state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool IProcessStream<TInput, TFinal>.ProcessNext(ref StreamState<TFinal> state, in TInput input) =>
-        _next.ProcessNext(ref state, input);
+        _continue = _next.ProcessNext(ref state, input);
 }

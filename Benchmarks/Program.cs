@@ -3,7 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Cistern.Spanner;
-using Cistern.Spanner.Ratchet;
+//using Cistern.Spanner.Ratchet;
 using HonkPerf.NET.RefLinq;
 using System.Collections.Immutable;
 
@@ -148,6 +148,7 @@ public class FirstTest
     public int Manual()
     {
         var sum = 0;
+
         //for(var i= _asArray.Length-1; i >= 0; --i)
         for (var i = 0; i < _asArray.Length; ++i)
         {
@@ -157,9 +158,26 @@ public class FirstTest
             {
                 x *= 3;
                 if ((x & 1) == 0)
-                    sum += x;
+                    sum = (sum*sum) + x;
             }
         }
+
+        foreach (var n in new[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 })
+        {
+            var x = n;
+
+            x *= 3;
+            if ((x & 1) == 0)
+            {
+                x *= 3;
+                if ((x & 1) == 0)
+                    sum = (sum * sum) + x;
+            }
+        }
+
+        foreach (var n in new[] { 31, 37, 41, 43, 45, 47, 53, 59, 61, 67 })
+            sum = (sum * sum) + n;
+
         return sum;
     }
 
@@ -168,11 +186,31 @@ public class FirstTest
     {
         return
             data.Span
+            .Append(2)
+            .Append(3)
+            .Append(5)
+            .Append(7)
+            .Append(11)
+            .Append(13)
+            .Append(17)
+            .Append(19)
+            .Append(23)
+            .Append(29)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
-            .Sum()
+            .Append(31)
+            .Append(37)
+            .Append(41)
+            .Append(43)
+            .Append(45)
+            .Append(47)
+            .Append(53)
+            .Append(59)
+            .Append(61)
+            .Append(67)
+            .Aggregate(0, (a, c) => (a*a) + c)
             ;
     }
 
@@ -183,15 +221,35 @@ public class FirstTest
     {
         var x =
             data.Span
+            .Append(2)
+            .Append(3)
+            .Append(5)
+            .Append(7)
+            .Append(11)
+            .Append(13)
+            .Append(17)
+            .Append(19)
+            .Append(23)
+            .Append(29)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
+            .Append(31)
+            .Append(37)
+            .Append(41)
+            .Append(43)
+            .Append(45)
+            .Append(47)
+            .Append(53)
+            .Append(59)
+            .Append(61)
+            .Append(67)
             ;
 
         var sum = 0;
         foreach (var item in x)
-            sum += item;
+            sum = sum*sum + item;
         return sum;
     }
 
@@ -202,11 +260,32 @@ public class FirstTest
     {
         return
             _asArray
+            .Append(2)
+            .Append(3)
+            .Append(5)
+            .Append(7)
+            .Append(11)
+            .Append(13)
+            .Append(17)
+            .Append(19)
+            .Append(23)
+            .Append(29)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
-            .Sum();
+            .Append(31)
+            .Append(37)
+            .Append(41)
+            .Append(43)
+            .Append(45)
+            .Append(47)
+            .Append(53)
+            .Append(59)
+            .Append(61)
+            .Append(67)
+            .Aggregate(0, (a, c) => (a * a) + c);
+
     }
 
 #if true
@@ -216,15 +295,35 @@ public class FirstTest
     {
         var x =
             _asArray
+            .Append(2)
+            .Append(3)
+            .Append(5)
+            .Append(7)
+            .Append(11)
+            .Append(13)
+            .Append(17)
+            .Append(19)
+            .Append(23)
+            .Append(29)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
+            .Append(31)
+            .Append(37)
+            .Append(41)
+            .Append(43)
+            .Append(45)
+            .Append(47)
+            .Append(53)
+            .Append(59)
+            .Append(61)
+            .Append(67)
             ;
 
         var sum = 0;
         foreach (var item in x)
-            sum += item;
+            sum = sum*sum + item;
         return sum;
     }
 
@@ -237,11 +336,31 @@ public class FirstTest
         return
             _asArray
             .ToRefLinq()
+            .Append(2)
+            .Append(3)
+            .Append(5)
+            .Append(7)
+            .Append(11)
+            .Append(13)
+            .Append(17)
+            .Append(19)
+            .Append(23)
+            .Append(29)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
-            .Sum();
+            .Append(31)
+            .Append(37)
+            .Append(41)
+            .Append(43)
+            .Append(45)
+            .Append(47)
+            .Append(53)
+            .Append(59)
+            .Append(61)
+            .Append(67)
+            .Aggregate(0, (a, c) => (a * a) + c);
     }
 
 #if true
@@ -252,15 +371,35 @@ public class FirstTest
         var x =
             _asArray
             .ToRefLinq()
+            .Append(2)
+            .Append(3)
+            .Append(5)
+            .Append(7)
+            .Append(11)
+            .Append(13)
+            .Append(17)
+            .Append(19)
+            .Append(23)
+            .Append(29)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
             .Select(x => x * 3)
             .Where(x => (x & 1) == 0)
+            .Append(31)
+            .Append(37)
+            .Append(41)
+            .Append(43)
+            .Append(45)
+            .Append(47)
+            .Append(53)
+            .Append(59)
+            .Append(61)
+            .Append(67)
             ;
 
         var sum = 0;
         foreach (var item in x)
-            sum += item;
+            sum += sum*sum + item;
         return sum;
     }
 }
