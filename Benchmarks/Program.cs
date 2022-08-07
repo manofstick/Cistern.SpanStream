@@ -84,7 +84,7 @@ public class FirstTest
 #if truex
     [Params(0, 1, 10, 100, 1000)]
 #else
-    [Params(100)]
+    [Params(20)]
 #endif
     public int N { get; set; }
 
@@ -102,9 +102,9 @@ public class FirstTest
             .ToArray();
         data = _asArray;
 
-        var tests = new Func<int>[]
+        var tests = new Func<bool>[]
         {
-            Manual,
+            //Manual,
             Spanner,
             Spanner_Enumerator,
             Linq,
@@ -130,6 +130,12 @@ public class FirstTest
             throw new Exception("Validation error");
     }
 
+    private static void Validate(bool baseline, bool check)
+    {
+        if (baseline != check)
+            throw new Exception("Validation error");
+    }
+
     private static void Validate(int? baseline, int? check)
     {
         if (!Nullable.Equals(baseline, check))
@@ -142,7 +148,7 @@ public class FirstTest
 
     static readonly Func<int, bool> CurrentPredicate = FiftyFifty;
 
-#if true
+#if truex
     [Benchmark(Baseline=true)]
 #endif
     public int Manual()
@@ -182,225 +188,99 @@ public class FirstTest
     }
 
     [Benchmark]
-    public int Spanner()
+    public bool Spanner()
     {
         return
             data.Span
-            .Append(2)
-            .Append(3)
-            .Append(5)
-            .Append(7)
-            .Append(11)
-            .Append(13)
-            .Append(17)
-            .Append(19)
-            .Append(23)
-            .Append(29)
             .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Append(31)
-            .Append(37)
-            .Append(41)
-            .Append(43)
-            .Append(45)
-            .Append(47)
-            .Append(53)
-            .Append(59)
-            .Append(61)
-            .Append(67)
-            .Aggregate(0, (a, c) => (a*a) + c)
+            .All(x => x <= 50)
             ;
     }
 
 #if true
     [Benchmark]
 #endif
-    public int Spanner_Enumerator()
+    public bool Spanner_Enumerator()
     {
         var x =
             data.Span
-            .Append(2)
-            .Append(3)
-            .Append(5)
-            .Append(7)
-            .Append(11)
-            .Append(13)
-            .Append(17)
-            .Append(19)
-            .Append(23)
-            .Append(29)
             .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Append(31)
-            .Append(37)
-            .Append(41)
-            .Append(43)
-            .Append(45)
-            .Append(47)
-            .Append(53)
-            .Append(59)
-            .Append(61)
-            .Append(67)
             ;
 
-        var sum = 0;
+        var all = true;
         foreach (var item in x)
-            sum = sum*sum + item;
-        return sum;
+        {
+            all = item <= 50;
+            if (!all)
+                break;
+        }
+        return all;
     }
 
 #if true
     [Benchmark]
 #endif
-    public int Linq()
+    public bool Linq()
     {
         return
             _asArray
-            .Append(2)
-            .Append(3)
-            .Append(5)
-            .Append(7)
-            .Append(11)
-            .Append(13)
-            .Append(17)
-            .Append(19)
-            .Append(23)
-            .Append(29)
             .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Append(31)
-            .Append(37)
-            .Append(41)
-            .Append(43)
-            .Append(45)
-            .Append(47)
-            .Append(53)
-            .Append(59)
-            .Append(61)
-            .Append(67)
-            .Aggregate(0, (a, c) => (a * a) + c);
-
+            //.Aggregate(0, (a, c) => (a*a) + c)
+            .All(x => x <= 50);
     }
 
 #if true
     [Benchmark]
 #endif
-    public int Linq_Enumerator()
+    public bool Linq_Enumerator()
     {
         var x =
             _asArray
-            .Append(2)
-            .Append(3)
-            .Append(5)
-            .Append(7)
-            .Append(11)
-            .Append(13)
-            .Append(17)
-            .Append(19)
-            .Append(23)
-            .Append(29)
             .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Append(31)
-            .Append(37)
-            .Append(41)
-            .Append(43)
-            .Append(45)
-            .Append(47)
-            .Append(53)
-            .Append(59)
-            .Append(61)
-            .Append(67)
             ;
 
-        var sum = 0;
+        var all = true;
         foreach (var item in x)
-            sum = sum*sum + item;
-        return sum;
+        {
+            all = item <= 50;
+            if (!all)
+                break;
+        }
+        return all;
     }
 
 
 #if true
     [Benchmark]
 #endif
-    public int Honk()
+    public bool Honk()
     {
         return
             _asArray
             .ToRefLinq()
-            .Append(2)
-            .Append(3)
-            .Append(5)
-            .Append(7)
-            .Append(11)
-            .Append(13)
-            .Append(17)
-            .Append(19)
-            .Append(23)
-            .Append(29)
             .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Append(31)
-            .Append(37)
-            .Append(41)
-            .Append(43)
-            .Append(45)
-            .Append(47)
-            .Append(53)
-            .Append(59)
-            .Append(61)
-            .Append(67)
-            .Aggregate(0, (a, c) => (a * a) + c);
+            .All(x => x <= 50);
     }
 
 #if true
     [Benchmark]
 #endif
-    public int Honk_Enumerator()
+    public bool Honk_Enumerator()
     {
         var x =
             _asArray
             .ToRefLinq()
-            .Append(2)
-            .Append(3)
-            .Append(5)
-            .Append(7)
-            .Append(11)
-            .Append(13)
-            .Append(17)
-            .Append(19)
-            .Append(23)
-            .Append(29)
             .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Select(x => x * 3)
-            .Where(x => (x & 1) == 0)
-            .Append(31)
-            .Append(37)
-            .Append(41)
-            .Append(43)
-            .Append(45)
-            .Append(47)
-            .Append(53)
-            .Append(59)
-            .Append(61)
-            .Append(67)
             ;
 
-        var sum = 0;
+        var all = true;
         foreach (var item in x)
-            sum += sum*sum + item;
-        return sum;
+        {
+            all = item <= 50;
+            if (!all)
+                break;
+        }
+        return all;
     }
 }
 

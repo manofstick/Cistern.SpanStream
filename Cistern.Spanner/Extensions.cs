@@ -44,7 +44,10 @@ public static class Extensions
         where TNode : struct, IStreamNode<TInitial, TCurrent> =>
         source.Execute<TResult, Aggregate<TCurrent, TAccumulate, TResult>>(new(func, seed, resultSelector));
 
-    //- [ ] `bool All<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TInitial, bool> predicate);`
+    public static bool All<TInitial, TCurrent, TNode, TContext>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TCurrent, bool> predicate)
+        where TNode : struct, IStreamNode<TInitial, TCurrent> =>
+        source.Execute<bool, All<TCurrent>>(new(predicate));
+
     //- [ ] `bool Any<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source);`
     //- [ ] `bool Any<TInitial>(this SpanHost<TInitial, TCurrent, TNode, TContext> source, Func<TInitial, bool> predicate);`
 
